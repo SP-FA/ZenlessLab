@@ -1,0 +1,7 @@
+node_modules/
+build/
+dist/
+.DS_Store
+*.log
+zzz_calc.db
+package-lock.json
