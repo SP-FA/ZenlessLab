@@ -6,7 +6,7 @@ import { FormulaView } from './components/FormulaView';
 import { Docs } from './components/Docs';
 import { Me } from './components/About';
 import { MarginalBenefitChart } from './components/MarginalBenefitChart';
-import { LayoutDashboard, Calculator as CalcIcon, BookOpen, FileCode, Github, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Calculator as CalcIcon, BookOpen, FileCode, AtSign, Github, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 type Tab = 'CALC' | 'CURVE' | 'FORMULA' | 'DOCS' | 'ME';
@@ -33,7 +33,7 @@ export default function App() {
     { id: 'CURVE', label: '边际收益曲线', icon: TrendingUp },
     { id: 'FORMULA', label: '计算公式', icon: FileCode },
     { id: 'DOCS', label: '使用文档', icon: BookOpen },
-    { id: 'ME', label: 'About Me', icon: Github },
+    { id: 'ME', label: 'About', icon: AtSign },
   ];
 
   return (

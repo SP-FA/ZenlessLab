@@ -4,8 +4,7 @@ import { MdAccessible, MdAccessibleForward } from 'react-icons/md';
 
 export const Docs: React.FC = () => {
   return (
-    <div className="prose prose-invert max-w-none p-6 bg-zinc-900/50 rounded-xl border border-zinc-800">
-      <div className="w-full bg-zinc-900/30 p-8 rounded-2xl border border-zinc-800/50">
+    <div className="prose prose-invert max-w-none p-8 bg-zinc-900/50 rounded-xl border border-zinc-800">
       <div className="mb-8" align="center">
         <h2 className="text-[30px] font-bold text-zinc-100 mb-2">使用指南</h2>
         <p className="text-sm text-zinc-500">本工具旨在通过精确数值计算帮助各位绳匠找到当前角色提升最大的词条方向，以更好的培养角色</p>
@@ -66,7 +65,6 @@ export const Docs: React.FC = () => {
           </h2>
         </div>
       </div>
-    </div>
     </div>
   );
 };
