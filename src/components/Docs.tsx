@@ -46,6 +46,9 @@ export const Docs: React.FC = () => {
           <h2 className="pl-8 pt-3 text-[18px] font-bold">
             d. 百分比数值：<span className="font-medium">直接输入数字（如 50 代表 50%），系统会自动转换</span>
           </h2>
+          <h2 className="pl-8 pt-3 text-[18px]">
+            e. 输入数据时尽量考虑到所有可能的 buff（如队友核心技、驱动盘4件套等），以获得更准确的计算结果
+          </h2>
         </div>
         <div className="p-6 bg-zinc-900/50 rounded-xl border border-zinc-800">
           <h2 className="text-[20px] font-bold text-zinc-100 flex items-center gap-2">

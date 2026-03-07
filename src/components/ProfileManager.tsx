@@ -68,6 +68,11 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
       name: '新角色',
       type: 'ATTACK',
       stats: { ...DEFAULT_STATS },
+      team: [
+        { name: '', engine: '', drive4: '', drive2: '' },
+        { name: '', engine: '', drive4: '', drive2: '' },
+        { name: '', engine: '', drive4: '', drive2: '' },
+      ],
       notes: ''
     });
   };
@@ -117,14 +122,110 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
         </div>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">备注信息</label>
-        <textarea
-          value={currentProfile.notes}
-          onChange={(e) => onUpdate({ ...currentProfile, notes: e.target.value })}
-          className="bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zzz-orange h-20 resize-none"
-          placeholder="输入角色备注..."
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-mono text-zinc-400 tracking-wider">配队与驱动盘信息</label>
+          <div className="overflow-x-auto bg-zinc-900/80 rounded-lg border border-zinc-800/50">
+            <table className="w-full text-sm text-left text-zinc-300 border-collapse">
+              <thead>
+                <tr className="border-b border-zinc-800">
+                  <th className="py-2 px-3 font-medium text-zinc-500 text-[10px]">角色名称</th>
+                  <th className="py-2 px-3 font-medium text-zinc-500 text-[10px]">音擎</th>
+                  <th className="py-2 px-3 font-medium text-zinc-500 text-[10px]">4件套</th>
+                  <th className="py-2 px-3 font-medium text-zinc-500 text-[10px]">2件套</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[0, 1, 2].map((idx) => (
+                  <tr key={idx} className="border-b border-zinc-800/100 last:border-0">
+                    <td className="py-2 px-3">
+                      <input
+                        type="text"
+                        value={currentProfile.team?.[idx]?.name || ''}
+                        onChange={(e) => {
+                          const emptyTeam = [
+                            { name: '', engine: '', drive4: '', drive2: '' },
+                            { name: '', engine: '', drive4: '', drive2: '' },
+                            { name: '', engine: '', drive4: '', drive2: '' },
+                          ];
+                          const newTeam = [...(currentProfile.team || emptyTeam)];
+                          newTeam[idx] = { ...newTeam[idx], name: e.target.value };
+                          onUpdate({ ...currentProfile, team: newTeam });
+                        }}
+                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-[13px] text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
+                        placeholder="角色"
+                      />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="text"
+                        value={currentProfile.team?.[idx]?.engine || ''}
+                        onChange={(e) => {
+                          const emptyTeam = [
+                            { name: '', engine: '', drive4: '', drive2: '' },
+                            { name: '', engine: '', drive4: '', drive2: '' },
+                            { name: '', engine: '', drive4: '', drive2: '' },
+                          ];
+                          const newTeam = [...(currentProfile.team || emptyTeam)];
+                          newTeam[idx] = { ...newTeam[idx], engine: e.target.value };
+                          onUpdate({ ...currentProfile, team: newTeam });
+                        }}
+                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-[13px] text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
+                        placeholder="音擎"
+                      />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="text"
+                        value={currentProfile.team?.[idx]?.drive4 || ''}
+                        onChange={(e) => {
+                          const emptyTeam = [
+                            { name: '', engine: '', drive4: '', drive2: '' },
+                            { name: '', engine: '', drive4: '', drive2: '' },
+                            { name: '', engine: '', drive4: '', drive2: '' },
+                          ];
+                          const newTeam = [...(currentProfile.team || emptyTeam)];
+                          newTeam[idx] = { ...newTeam[idx], drive4: e.target.value };
+                          onUpdate({ ...currentProfile, team: newTeam });
+                        }}
+                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-[13px] text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
+                        placeholder="4件套"
+                      />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="text"
+                        value={currentProfile.team?.[idx]?.drive2 || ''}
+                        onChange={(e) => {
+                          const emptyTeam = [
+                            { name: '', engine: '', drive4: '', drive2: '' },
+                            { name: '', engine: '', drive4: '', drive2: '' },
+                            { name: '', engine: '', drive4: '', drive2: '' },
+                          ];
+                          const newTeam = [...(currentProfile.team || emptyTeam)];
+                          newTeam[idx] = { ...newTeam[idx], drive2: e.target.value };
+                          onUpdate({ ...currentProfile, team: newTeam });
+                        }}
+                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-[13px] text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
+                        placeholder="2件套"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">备注信息</label>
+          <textarea
+            value={currentProfile.notes}
+            onChange={(e) => onUpdate({ ...currentProfile, notes: e.target.value })}
+            className="bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zzz-orange h-35 resize-none placeholder:text-zinc-600"
+            placeholder="输入角色备注"
+          />
+        </div>
       </div>
 
       <AnimatePresence>
