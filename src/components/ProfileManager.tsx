@@ -18,7 +18,16 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
     try {
       const res = await fetch('/api/profiles');
       const data = await res.json();
-      setProfiles(data);
+      // Ensure each profile has a team array of 3 objects
+      const sanitizedData = data.map((p: CharacterProfile) => ({
+        ...p,
+        team: p.team || [
+          { name: '', engine: '', drive4: '', drive2: '' },
+          { name: '', engine: '', drive4: '', drive2: '' },
+          { name: '', engine: '', drive4: '', drive2: '' },
+        ]
+      }));
+      setProfiles(sanitizedData);
     } catch (err) {
       console.error('Failed to fetch profiles', err);
     }
@@ -65,7 +74,7 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
 
   const handleNew = () => {
     onUpdate({
-      name: '新角色',
+      name: '新档案',
       type: 'ATTACK',
       stats: { ...DEFAULT_STATS },
       team: [
@@ -99,7 +108,7 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">角色名称</label>
+          <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">档案名称</label>
           <input
             type="text"
             value={currentProfile.name}

@@ -45,9 +45,9 @@ export const Calculator: React.FC<CalculatorProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* 基础数值输入 */}
-      <div className="lg:col-span-1 flex flex-col gap-6">
+      <div className="lg:col-span-2 flex flex-col gap-6">
         <div className="p-6 bg-zinc-900/50 rounded-xl border border-zinc-800">
           <h2 className="text-md font-medium text-zinc-100 mb-6 flex items-center gap-2">
             <MdAccessible size={20} className="text-zzz-orange" />
@@ -76,7 +76,8 @@ export const Calculator: React.FC<CalculatorProps> = ({
             ))}
           </div>
         </div>
-
+      </div>
+      <div className="lg:col-span-1 flex flex-col gap-6">
         <div className="p-6 bg-zinc-900/50 rounded-xl border border-zinc-800">
           <h2 className="text-md font-medium text-zinc-100 mb-6 flex items-center gap-2">
             <MdAccessibleForward size={20} className="text-zzz-orange" />
@@ -98,9 +99,8 @@ export const Calculator: React.FC<CalculatorProps> = ({
           </div>
         </div>
       </div>
-
       {/* 收益展示 */}
-      <div className="flex flex-col gap-6">
+      <div className="lg:col-span-1 flex flex-col gap-6">
         <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl">
           <div className="flex flex-col items-center justify-center py-4 border-b border-zinc-800 mb-6">
             <span className="text-xs text-zinc-500 uppercase tracking-widest mb-1">当前伤害期望</span>

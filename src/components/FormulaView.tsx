@@ -3,7 +3,7 @@ import React from 'react';
 export const FormulaView: React.FC = () => {
   return (
     <div className="w-full bg-zinc-900/30 p-8 rounded-2xl border border-zinc-800/50">
-      <div className="mb-8" align="center">
+      <div className="mb-8 text-center">
         <h2 className="text-[30px] font-bold text-zinc-100 mb-2">核心计算公式</h2>
         <p className="text-sm text-zinc-500">本工具严格遵循以下公式进行伤害期望与收益计算</p>
       </div>
@@ -85,7 +85,7 @@ export const FormulaView: React.FC = () => {
           <h2 className="pl-8 pt-2">
             设某属性 k（如暴击率、战前大攻击）的数值为 x，该属性所在区间计算函数为 f(k,x)，设提升值为 a，可以通过如下方式计算出 a 为伤害提升做出了多少贡献，即词条 k 提高 a 的收益：
           </h2>
-          <h2 className="pl-8 pt-2 font-bold" align="center">
+          <h2 className="pl-8 pt-2 font-bold text-center">
             收益 = f(k, x + a) / f(k, x) - 1
           </h2>
         </div>

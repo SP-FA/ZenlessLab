@@ -23,11 +23,19 @@ export interface CharacterStats {
   anomaly_prof: number;  // 异常精通
 }
 
+export interface TeamMember {
+  name: string;
+  engine: string;
+  drive4: string;
+  drive2: string;
+}
+
 export interface CharacterProfile {
   id?: number;
   name: string;
   type: CharacterType;
   stats: CharacterStats;
+  team?: TeamMember[];
   notes: string;
   updated_at?: string;
 }
@@ -41,14 +49,14 @@ export const DEFAULT_STATS: CharacterStats = {
 export const STAT_LABELS: Record<keyof CharacterStats, string> = {
   atk_base: "攻击力白值",
   atk_flat_pre: "战前小攻击",
-  atk_pct_pre: "战前大攻击",
+  atk_pct_pre: "战前大攻击 (%)",
   atk_flat_post: "战后小攻击",
-  atk_pct_post: "战后大攻击",
+  atk_pct_post: "战后大攻击 (%)",
   hp_base: "生命值白值",
   hp_flat_pre: "战前小生命",
-  hp_pct_pre: "战前大生命",
+  hp_pct_pre: "战前大生命 (%)",
   hp_flat_post: "战后小生命",
-  hp_pct_post: "战后大生命",
+  hp_pct_post: "战后大生命 (%)",
   crit_rate: "暴击率 (%)",
   crit_dmg: "暴击伤害 (%)",
   dmg_bonus: "增伤 (%)",

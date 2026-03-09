@@ -4,7 +4,7 @@ import { Github, Mail, Square, SquareCheckBig } from 'lucide-react';
 export const Me: React.FC = () => {
   return (
     <div className="prose prose-invert max-w-none p-8 bg-zinc-900/50 rounded-xl border border-zinc-800">
-      <div className="mb-8" align="center">
+      <div className="mb-8 text-center">
         <h2 className="text-[30px] font-bold text-zinc-100 mb-2">About Me</h2>
         <p className="text-sm text-zinc-500">👋 我是 SPFA，感谢使用本工具，有任何意见建议欢迎随时与我联系！</p>
       </div>
@@ -32,7 +32,7 @@ export const Me: React.FC = () => {
       </div>
 
       <br />
-      <div className="mb-8" align="center">
+      <div className="mb-8 text-center">
         <h2 className="text-[30px] font-bold text-zinc-100 mb-2">TODO</h2>
         <p className="text-sm text-zinc-500">💪 我会尽量完成</p>
       </div>
@@ -51,7 +51,28 @@ export const Me: React.FC = () => {
             <SquareCheckBig className="inline text-[#00aa00]" size={18} /> 添加配队信息
           </h2>
           <h2 className="pl-8 pt-3 text-[18px]">
+            <Square className="inline text-zzz-orange" size={18} /> 制作 Logo
+          </h2>
+          <h2 className="pl-8 pt-3 text-[18px]">
             <Square className="inline text-zzz-orange" size={18} /> 加入异放机制
+          </h2>
+          <h2 className="pl-8 pt-3 text-[18px]">
+            <Square className="inline text-zzz-orange" size={18} /> 自动填入角色白值
+          </h2>
+          <h2 className="pl-8 pt-3 text-[18px]">
+            <Square className="inline text-zzz-orange" size={18} /> 辅助选择驱动盘
+          </h2>
+          <h2 className="pl-8 pt-3 text-[18px]">
+            <Square className="inline text-zzz-orange" size={18} /> 使用 uid 查看账号信息
+          </h2>
+          <h2 className="pl-8 pt-3 text-[18px]">
+            <Square className="inline text-zzz-orange" size={18} /> 自动获取角色面板
+          </h2>
+          <h2 className="pl-8 pt-3 text-[18px]">
+            <Square className="inline text-zzz-orange" size={18} /> 根据配队自动填写基础数值
+          </h2>
+          <h2 className="pl-8 pt-3 text-[18px]">
+            <SquareCheckBig className="inline text-[#00aa00]" size={18} /> 使用配置文件提供自定义参数
           </h2>
         </div>
       </div>
@@ -59,7 +80,7 @@ export const Me: React.FC = () => {
       <br />
       <br />
       <br />
-      <div className="mb-2" align="center">
+      <div className="mb-2 text-center">
         <h2 className="text-[30px] font-bold text-zinc-100">- 新艾利都，永不落幕 -</h2>
       </div>
     </div>
