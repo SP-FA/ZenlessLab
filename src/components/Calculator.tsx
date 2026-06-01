@@ -2,8 +2,7 @@ import React, { useMemo } from 'react';
 import { CharacterStats, CharacterType, STAT_LABELS } from '../types';
 import { calculateDamage, calculateGain } from '../utils/calculator';
 import { StatInput } from './StatInput';
-import { TrendingUp } from 'lucide-react';
-import { MdAccessible, MdAccessibleForward } from 'react-icons/md';
+import { TrendingUp, Compass, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface CalculatorProps {
@@ -45,20 +44,20 @@ export const Calculator: React.FC<CalculatorProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* 基础数值输入 */}
       <div className="lg:col-span-2 flex flex-col gap-6">
-        <div className="p-6 bg-zinc-900/50 rounded-xl border border-zinc-800">
-          <h2 className="text-md font-medium text-zinc-100 mb-6 flex items-center gap-2">
-            <MdAccessible size={20} className="text-zzz-orange" />
+        <div className="p-7 nm-raised rounded-2xl">
+          <h2 className="text-xl font-bold text-zinc-800 flex items-center gap-2">
+            <Compass size={20} className="text-zzz-orange" />
             角色基础数值
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4">
             {Object.entries(statGroups).map(([group, keys]) => (
               <React.Fragment key={group}>
-                <div className="col-span-full mt-2 mb-1">
+                <div className="col-span-full mt-4 mb-2">
                   <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{group}</span>
-                  <div className="h-[1px] bg-zinc-800 mt-1"></div>
+                  <div className="h-[1px] bg-gradient-to-r from-zinc-250/80 via-zinc-200 to-transparent mt-1.5"></div>
                 </div>
                 {keys.map((key) => {
                   const k = key as keyof CharacterStats;
@@ -78,12 +77,12 @@ export const Calculator: React.FC<CalculatorProps> = ({
         </div>
       </div>
       <div className="lg:col-span-1 flex flex-col gap-6">
-        <div className="p-6 bg-zinc-900/50 rounded-xl border border-zinc-800">
-          <h2 className="text-md font-medium text-zinc-100 mb-6 flex items-center gap-2">
-            <MdAccessibleForward size={20} className="text-zzz-orange" />
-            词条提升值输入
+        <div className="p-7 nm-raised rounded-2xl">
+          <h2 className="text-xl font-bold text-zinc-800 mb-6 flex items-center gap-2">
+            <Sparkles size={20} className="text-zzz-orange" />
+            词条提升值
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
             {Object.keys(STAT_LABELS).filter(k => k !== 'atk_base' && k !== 'hp_base').map((key) => {
               const k = key as keyof CharacterStats;
               return (
@@ -99,22 +98,22 @@ export const Calculator: React.FC<CalculatorProps> = ({
           </div>
         </div>
       </div>
-      {/* 收益展示 */}
+
       <div className="lg:col-span-1 flex flex-col gap-6">
-        <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl">
-          <div className="flex flex-col items-center justify-center py-4 border-b border-zinc-800 mb-6">
-            <span className="text-xs text-zinc-500 uppercase tracking-widest mb-1">当前伤害期望</span>
-            <span className="text-4xl font-mono font-bold text-zzz-orange">
+        <div className="p-7 nm-raised rounded-2xl">
+          <div className="relative overflow-hidden flex flex-col items-center justify-center py-7 nm-sunken rounded-2xl border border-zinc-200/50 mb-6 group cursor-default transition-all duration-300 hover:border-zzz-orange/15">
+            <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-[0.25em] mb-2.5 group-hover:text-zzz-orange transition-colors duration-300">当前伤害期望</span>
+            <span className="text-5xl font-mono font-black text-zzz-orange drop-shadow-[0_0_15px_rgba(243,127,15,0.25)] select-all tracking-tight tabular-nums">
               {currentDamage.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </span>
           </div>
 
-          <h3 className="text-sm font-medium text-zinc-400 mb-4 flex items-center gap-2">
-            <TrendingUp size={16} className="text-zzz-orange"/>
+          <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <TrendingUp size={15} className="text-zzz-orange"/>
             词条收益分析 (%)
           </h3>
           
-          <div className="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="flex flex-col gap-5 max-h-[600px] overflow-y-auto p-4">
             {Object.entries(gains)
               .filter(([_, gain]) => gain > 0)
               .sort((a, b) => b[1] - a[1])
@@ -122,27 +121,27 @@ export const Calculator: React.FC<CalculatorProps> = ({
                 <motion.div
                   layout
                   initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  animate={{ opacity: 1, x: 0  }}
                   key={key}
-                  className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-zinc-700/50"
+                  className="flex items-center justify-between p-3.5 nm-raised rounded-xl"
                 >
-                  <span className="text-xs text-zinc-300">{STAT_LABELS[key as keyof CharacterStats].split(' (')[0]}</span>
+                  <span className="text-xs text-zinc-600 font-semibold">{STAT_LABELS[key as keyof CharacterStats].split(' (')[0]}</span>
                   <div className="flex items-center gap-2">
-                    <div className="h-1.5 w-16 bg-zinc-700 rounded-full overflow-hidden">
+                    <div className="h-2 w-16 bg-zinc-200/70 rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-zzz-orange" 
-                        style={{ width: `${Math.min(100, gain * 100 * 5)}%` }}
+                        style={{ width: `${Math.min(100, gain * 100)}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm font-mono font-medium text-zzz-orange">
+                    <span className="text-sm font-mono font-bold text-zzz-orange min-w-[65px] text-right">
                       +{(gain * 100).toFixed(2)}%
                     </span>
                   </div>
                 </motion.div>
               ))}
             {Object.values(improvements).every(v => !v || v === 0) && (
-              <div className="text-center py-10 text-zinc-600 text-xs italic">
-                在左侧输入提升值以查看收益分析
+              <div className="text-center py-12 text-zinc-400 text-xs italic font-medium">
+                在左侧输入词条提升值，开启实时收益分析
               </div>
             )}
           </div>
@@ -151,3 +150,4 @@ export const Calculator: React.FC<CalculatorProps> = ({
     </div>
   );
 };
+

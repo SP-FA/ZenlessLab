@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -8,10 +8,141 @@
 }
 
 body {
-  @apply bg-zinc-950 text-zinc-100 antialiased;
+  @apply bg-[#f0f3f6] text-zinc-800 antialiased;
 }
 
-.custom-scrollbar::-webkit-scrollbar {
+/* --- Neumorphism Soft UI Styles (Premium Light Theme) --- */
+
+/* 去掉所有滚动条 */
+*::-webkit-scrollbar {
+  display: none;
+}
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.header.left {
+  grid-column: 1 / 2;
+  justify-self: start;
+}
+
+.header.center {
+  grid-column: 2 / 3;
+  justify-self: center;
+  white-space: nowrap;
+}
+
+/* Raised element (extrudes outwards) */
+.nm-raised {
+  background-color: #f0f3f6;
+  box-shadow: 6px 6px 12px #d1d9e6, -6px -6px 12px #ffffff;
+}
+
+.nm-raised-big {
+  background-color: #f4f6f9;
+  box-shadow: 6px 6px 6px #d1d9e6, -6px -6px 6px #ffffff;
+}
+
+.nm-raised-active {
+  box-shadow:
+    inset 2px 2px 5px #d1d9e6, inset -2px -2px 5px #ffffff;
+  transform: scale(0.94);
+}
+
+/* Interacting raised element */
+.nm-raised-interactive {
+  background-color: #f0f3f6;
+  box-shadow: 6px 6px 12px #d1d9e6, -6px -6px 12px #ffffff;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nm-raised-interactive:hover {
+  background-color: #f4f6f9;
+  box-shadow: 1px 1px 2px #d1d9e6, -1px -1px 2px #ffffff;
+  transform: scale(0.97);
+}
+
+.nm-raised-interactive:active {
+  box-shadow:
+    inset 2px 2px 5px #d1d9e6, inset -2px -2px 5px #ffffff;
+  transform: scale(0.94);
+}
+
+.nm-raised-interactive:has(.delete-btn:active) {
+  /* 复制父元素正常状态样式，覆盖 :active */
+  background-color: #f4f6f9;
+  box-shadow: 1px 1px 2px #d1d9e6, -1px -1px 2px #ffffff;
+  transform: scale(0.97);
+}
+
+/* Orange active raised button */
+.nm-orange-raised {
+  background-color: #f37f0f;
+  color: #ffffff;
+  box-shadow: 5px 5px 12px #e2d5c8, -5px -5px 12px #ffffff, inset 0 0 10px #faf3eb;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nm-orange-raised:hover {
+  background-color: #fa8b1e;
+  box-shadow: 6px 6px 15px rgba(243, 127, 15, 0.45), -6px -6px 15px #ffffff;
+}
+
+.nm-orange-raised:active {
+  background-color: #e27205;
+  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.2), inset -3px -3px 6px rgba(255, 255, 255, 0.1);
+}
+
+/* Interacting orange raised element */
+.nm-orange-raised-interactive {
+  background-color: #f37f0f;
+  color: #ffffff;
+  box-shadow: 
+    6px 6px 12px #d1d9e6, -6px -6px 12px #ffffff,
+    inset 1px 1px 2px #ffaa4d, inset -1px -1px 2px #d46f0e;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nm-orange-raised-interactive:hover {
+  background-color: #fa8b1e;
+  box-shadow: 
+  1px 1px 2px #d1d9e6, -1px -1px 2px #ffffff,
+  inset 1px 1px 2px #ffaa4d, inset -1px -1px 2px #d46f0e;
+  transform: scale(0.97);
+}
+
+.nm-orange-raised-interactive:active {
+  box-shadow:
+    inset 2px 2px 5px #d46f0e, inset -2px -2px 5px #ffaa4d;
+  transform: scale(0.94);
+}
+
+/* Sunken input or inactive area */
+.nm-sunken {
+  background-color: #edf0f4;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
+}
+
+.nm-sunken-focus-within {
+  box-shadow: inset 2px 2px 4px rgba(9, 34, 75, 0.518), inset -2px -2px 4px rgba(88, 108, 137, 0.25);
+  transition: all 0.25s ease;
+}
+
+/* Inset / Sunken for simple active selections */
+.nm-sunken-active {
+  background-color: #e5e9f0;
+  border: 1px solid rgba(243, 127, 15, 0.3);
+  box-shadow: inset 4px 4px 8px #cbd5e1, inset -4px -4px 8px #ffffff;
+}
+
+/* .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
 
@@ -20,9 +151,9 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-zinc-800 rounded-full;
+  @apply bg-zinc-300 rounded-full;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  @apply bg-zinc-700;
-}
+  @apply bg-zinc-400;
+} */

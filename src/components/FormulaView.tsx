@@ -1,93 +1,165 @@
 import React from 'react';
+import { Binary, Shield, Compass, Swords, HelpCircle } from 'lucide-react';
 
 export const FormulaView: React.FC = () => {
   return (
-    <div className="w-full bg-zinc-900/30 p-8 rounded-2xl border border-zinc-800/50">
-      <div className="mb-8 text-center">
-        <h2 className="text-[30px] font-bold text-zinc-100 mb-2">核心计算公式</h2>
-        <p className="text-sm text-zinc-500">本工具严格遵循以下公式进行伤害期望与收益计算</p>
+    <div className="w-full nm-raised p-8 rounded-2xl">
+      <div className="mb-10 text-center">
+        <h2 className="text-xl font-bold text-zinc-800 flex items-center justify-center gap-2 mb-2">
+          <Binary size={20} className="text-zzz-orange" />
+          核心计算公式
+        </h2>
+        <p className="text-sm text-zinc-500 leading-relaxed">
+          本工具严格遵循以下公式进行伤害期望与收益计算
+        </p>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-        <div className="p-6 bg-zinc-900/50 rounded-xl border border-zinc-800">
-          <h2 className="text-[20px] font-bold text-zinc-100 flex items-center gap-2">
-            基础乘区计算
-          </h2>
-          <h2 className="pl-8 pt-3 text-[18px] font-bold">
-            1. 基础攻击区：
-          </h2><h2 className="pl-16 pt-2">
-            (攻击力白值 * (1 + <span className="text-[#f37f0f]">战前大攻击%</span>) + <span className="text-[#ffba04]">战前小攻击</span>) * (1 + <span className="text-[#f35f0f]">战后大攻击%</span>) + <span className="text-[#ff9a04]">战后小攻击</span>
-          </h2>
-          <h2 className="pl-8 pt-3 text-[18px] font-bold">
-            2. 基础生命区：
-          </h2><h2 className="pl-16 pt-2">
-            (生命值白值 * (1 + <span className="text-[#f37f0f]">战前大生命%</span>) + <span className="text-[#ffba04]">战前小生命</span>) * (1 + <span className="text-[#f35f0f]">战后大生命%</span>) + <span className="text-[#ff9a04]">战后小生命</span>
-          </h2>
-          <h2 className="pl-8 pt-3 text-[18px] font-bold">
-            3. 增伤区：
-          </h2><h2 className="pl-16 pt-2">
-            1 + <span className="text-[#8b5cf6]">增伤%</span><span className="text-[#555555]">(包括伤害提升、伤害加成、属性伤害加成)</span>
-          </h2>
-          <h2 className="pl-8 pt-3 text-[18px] font-bold">
-            4. 抗性区：
-          </h2><h2 className="pl-16 pt-2">
-            1 + <span className="text-[#ec4899]">减抗%</span> - <span className="text-[#555555]">敌人抗性%</span>
-          </h2>
-          <h2 className="pl-8 pt-3 text-[18px] font-bold">
-            5. 贯穿力：
-          </h2><h2 className="pl-16 pt-2">
-            0.3 * 基础攻击区 + 0.1 * 基础生命区
-          </h2>
+
+      <div>
+        <div className="mb-5 p-6 nm-sunken rounded-2xl flex flex-col gap-6">
+          <h3 className="text-x font-bold text-zinc-800 block flex items-center gap-1.5">
+            <Swords size={17} className="text-zzz-orange" />
+            基础乘区
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex flex-col p-6 nm-raised rounded-xl gap-1.5">
+              <span className="text-xs font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-zzz-orange rounded-full"></div>
+                基础攻击区
+              </span>
+              <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
+                (<span className="font-bold">攻击力白值</span> &times; (1 + <span className="text-[#f37f0f] font-bold">战前大攻击%</span>) + <span className="text-[#ffba04] font-bold">战前小攻击</span>) &times; (1 + <span className="text-[#f35f0f] font-bold">战后大攻击%</span>) + <span className="text-[#ff9a04] font-bold">战后小攻击</span>
+              </div>
+            </div>
+            <div className="flex flex-col p-6 nm-raised rounded-xl gap-1.5">
+              <span className="text-xs font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-zzz-orange rounded-full"></div>
+                基础生命区
+              </span>
+              <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
+                (<span className="font-bold">生命值白值</span> &times; (1 + <span className="text-[#f37f0f] font-bold">战前大生命%</span>) + <span className="text-[#ffba04] font-bold">战前小生命</span>) &times; (1 + <span className="text-[#f35f0f] font-bold">战后大生命%</span>) + <span className="text-[#ff9a04] font-bold">战后小生命</span>
+              </div>
+            </div>
+            <div className="flex flex-col p-6 nm-raised rounded-xl gap-1.5">
+              <span className="text-xs font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-[#8b5cf6] rounded-full"></div>
+                增伤区
+              </span>
+              <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
+                1 + <span className="text-[#8b5cf6] font-bold">增伤%</span>
+                <div className="text-[10px] text-zinc-550 mt-2 font-sans">
+                  * 包括伤害提升、伤害加成、属性伤害加成
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col p-6 nm-raised rounded-xl gap-1.5">
+              <span className="text-xs font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-[#ec4899] rounded-full"></div>
+                抗性区
+              </span>
+              <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
+                1 + <span className="text-[#ec4899] font-bold">减抗%</span> - 敌人抗性%
+              </div>
+            </div>
+            <div className="flex flex-col p-6 nm-raised rounded-xl gap-1.5">
+              <span className="text-xs font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-zzz-orange rounded-full"></div>
+                贯穿力
+              </span>
+              <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
+                0.3 &times; <span className="font-bold">基础攻击区</span> + 0.1 &times; <span className="font-bold">基础生命区</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="p-6 bg-zinc-900/50 rounded-xl border border-zinc-800">
-          <h2 className="text-[20px] font-bold text-zinc-100 flex items-center gap-2">
-            防御区计算（默认角色等级60，敌人等级60+）
-          </h2>
-          <h2 className="pl-8 pt-3 text-[18px] font-bold">
-            1. 基础防御力：
-          </h2><h2 className="pl-16 pt-2">
-            794<span className="text-[#555555]">(标准等级基数)</span> * 60<span className="text-[#555555]">(防御参数)</span> / 50
-          </h2>
-          <h2 className="pl-8 pt-3 text-[18px] font-bold">
-            2. 敌人防御力：
-          </h2><h2 className="pl-16 pt-2">
-            基础防御力 * (1 + <span className="text-[#555555]">防御加成%</span> - <span className="text-[#06b6d4]">减防%</span>) + <span className="text-[#555555]">固定防御</span>
-          </h2>
-          <h2 className="pl-8 pt-3 text-[18px] font-bold">
-            3. 防御区：
-          </h2><h2 className="pl-16 pt-2">
-            794<span className="text-[#555555]">(标准等级基数)</span> / (敌人防御力 * (1 - <span className="text-[#24ff00]">穿透率%</span>) - <span className="text-[#00ff85]">穿透值</span> + 794<span className="text-[#555555]">(标准等级基数)</span>)
-          </h2>
+
+        <div className="mb-5 p-6 nm-sunken rounded-2xl flex flex-col gap-6">
+          <h3 className="text-x font-bold text-zinc-800 block flex items-center gap-1.5">
+            <Shield size={17} className="text-zzz-orange" />
+            防御区
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-6 nm-raised rounded-xl">
+              <span className="text-xs font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-zzz-orange rounded-full"></div>
+                基础防御力
+              </span>
+              <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
+                <span className="font-bold">标准等级基数</span> &times; <span className="font-bold">防御参数</span> / 50
+                <div className="text-[10px] text-zinc-550 mt-2 font-sans">
+                  * 默认角色等级60，敌人等级60+，所以标准等级基数取 794，防御参数取 60
+                </div>
+              </div>
+            </div>
+            <div className="p-6 nm-raised rounded-xl">
+              <span className="text-xs font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-zzz-orange rounded-full"></div>
+                敌人防御力
+              </span>
+              <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
+                <span className="font-bold">基础防御力</span> &times; (1 + 敌人防御加成% - <span className="text-[#06b6d4] font-bold">减防%</span>) + 固定防御
+              </div>
+            </div>
+            <div className="p-6 nm-raised rounded-xl">
+              <span className="text-xs font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-[#06b6d4] rounded-full"></div>
+                防御区
+              </span>
+              <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
+                <span className="font-bold">标准等级基数</span> / (<span className="font-bold">敌人防御力</span> &times; (1 - <span className="text-[#06bc0a] font-bold">穿透率%</span>) - <span className="text-[#05b669] font-bold">穿透值</span> + <span className="font-bold">标准等级基数</span>)
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="p-6 bg-zinc-900/50 rounded-xl border border-zinc-800">
-          <h2 className="text-[20px] font-bold text-zinc-100 flex items-center gap-2">
-            伤害期望
-          </h2>
-          <h2 className="pl-8 pt-3 text-[18px] font-bold">
-            1. 强攻
-          </h2><h2 className="pl-16 pt-2">
-            基础攻击区 * (1 + <span className="text-[#ff3207]">暴击率%</span> * <span className="text-[#ef4444]">暴伤%</span>) * 增伤区 * 抗性区 * 防御区
-          </h2>
-          <h2 className="pl-8 pt-3 text-[18px] font-bold">
-            2. 异常
-          </h2><h2 className="pl-16 pt-2">
-            基础攻击区 * 异常精通 * 增伤区 * 抗性区 * 防御区
-          </h2>
-          <h2 className="pl-8 pt-3 text-[18px] font-bold">
-            3. 命破
-          </h2><h2 className="pl-16 pt-2">
-            贯穿力 * (1 + <span className="text-[#ff3207]">暴击率%</span> * <span className="text-[#ef4444]">暴伤%</span>) * 增伤区 * 抗性区
-          </h2>
+
+        <div className="mb-5 p-6 nm-sunken rounded-2xl flex flex-col gap-6">
+          <h3 className="text-x font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+            <Compass size={17} className="text-zzz-orange" />
+            各输出职业最终期望公式
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-4 nm-raised rounded-xl">
+              <span className="text-xs font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-zzz-orange rounded-full"></div>
+                强攻
+              </span>
+              <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
+                <span className="text-zzz-orange font-bold">基础攻击区</span> &times; (1 + <span className="text-[#ff3207] font-bold">暴击率%</span> &times; <span className="text-[#ef4444] font-bold">暴击伤害%</span>) &times; <span className="text-[#8b5cf6] font-bold">增伤区</span> &times; <span className="text-[#ec4899] font-bold">抗性区</span> &times; <span className="text-[#06b6d4] font-bold">防御区</span>
+              </div>
+            </div>
+
+            <div className="p-4 nm-raised rounded-xl">
+              <span className="text-xs font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-zzz-orange rounded-full"></div>
+                异常
+              </span>
+              <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
+                <span className="text-zzz-orange font-bold">基础攻击区</span> &times; <span className="text-zzz-orange font-bold">异常精通</span> &times; <span className="text-[#8b5cf6] font-bold">增伤区</span> &times; <span className="text-[#ec4899] font-bold">抗性区</span> &times; <span className="text-[#06b6d4] font-bold">防御区</span>
+              </div>
+            </div>
+
+            <div className="p-4 nm-raised rounded-2xl">
+              <span className="text-xs font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-zzz-orange rounded-full"></div>
+                命破
+              </span>
+              <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
+                <span className="text-zzz-orange font-bold">贯穿力</span> &times; (1 + <span className="text-[#ff3207] font-bold">暴击率%</span> &times; <span className="text-[#ef4444] font-bold">暴击伤害%</span>) &times; <span className="text-[#8b5cf6] font-bold">增伤区</span> &times; <span className="text-[#ec4899] font-bold">抗性区</span> &times; <span className="text-[#06b6d4] font-bold">防御区</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="p-6 bg-zinc-900/50 rounded-xl border border-zinc-800">
-          <h2 className="text-[20px] font-bold text-zinc-100 flex items-center gap-2">
+
+        <div className="p-6 nm-sunken rounded-xl border border-zinc-200/10 flex flex-col gap-2 md:col-span-2">
+          <h3 className="text-x font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
+            <HelpCircle size={17} className="text-zzz-orange" />
             词条收益计算
-          </h2>
-          <h2 className="pl-8 pt-2">
-            设某属性 k（如暴击率、战前大攻击）的数值为 x，该属性所在区间计算函数为 f(k,x)，设提升值为 a，可以通过如下方式计算出 a 为伤害提升做出了多少贡献，即词条 k 提高 a 的收益：
-          </h2>
-          <h2 className="pl-8 pt-2 font-bold text-center">
-            收益 = f(k, x + a) / f(k, x) - 1
-          </h2>
+          </h3>
+          <p className="text-xs text-zinc-650 leading-relaxed">
+            设某属性 <code>k</code> 的数值为 <code>x</code>，该属性所在区间计算函数为 <code>f(k, x)</code>，设提升值为 <code>&Delta;</code>，可以通过如下方式计算出 <code>&Delta;</code> 为伤害提升做出了多少贡献，即词条 <code>k</code> 提高 <code>&Delta;</code> 的收益：
+          </p>
+          <div className="nm-raised text-center py-4 rounded-xl font-mono text-sm text-zzz-orange font-bold">
+            <code>收益 = [f(k, x + &Delta;) / f(k, x)] - 1</code>
+          </div>
         </div>
       </div>
     </div>

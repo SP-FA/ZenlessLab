@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterProfile, CharacterStats, CharacterType, DEFAULT_STATS, STAT_LABELS } from '../types';
-import { StatInput } from './StatInput';
+import { CharacterProfile, CharacterType, DEFAULT_STATS } from '../types';
+import { storage } from '../services/storage';
 import { Save, Trash2, FolderOpen, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -14,61 +14,21 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
   const [profiles, setProfiles] = useState<CharacterProfile[]>([]);
   const [showList, setShowList] = useState(false);
 
-  const fetchProfiles = async () => {
-    try {
-      const res = await fetch('/api/profiles');
-      const data = await res.json();
-      // Ensure each profile has a team array of 3 objects
-      const sanitizedData = data.map((p: CharacterProfile) => ({
-        ...p,
-        team: p.team || [
-          { name: '', engine: '', drive4: '', drive2: '' },
-          { name: '', engine: '', drive4: '', drive2: '' },
-          { name: '', engine: '', drive4: '', drive2: '' },
-        ]
-      }));
-      setProfiles(sanitizedData);
-    } catch (err) {
-      console.error('Failed to fetch profiles', err);
-    }
-  };
-
   useEffect(() => {
-    fetchProfiles();
+    setProfiles(storage.getProfiles());
   }, []);
 
-  const handleSave = async () => {
-    try {
-      const method = currentProfile.id ? 'PUT' : 'POST';
-      const url = currentProfile.id ? `/api/profiles/${currentProfile.id}` : '/api/profiles';
-      
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(currentProfile),
-      });
-      
-      if (res.ok) {
-        const result = await res.json();
-        if (method === 'POST') {
-          // Merge the new ID into the current profile data
-          onSelect({ ...currentProfile, id: result.id });
-        }
-        fetchProfiles();
-      }
-    } catch (err) {
-      console.error('Save failed', err);
-    }
+  const handleSave = () => {
+    const saved = storage.saveProfile(currentProfile);
+    onSelect(saved);
+    setProfiles(storage.getProfiles());
   };
 
-  const handleDelete = async (id: number) => {
-    try {
-      const res = await fetch(`/api/profiles/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        fetchProfiles();
-      }
-    } catch (err) {
-      console.error('Delete failed', err);
+  const handleDelete = (id: number) => {
+    storage.deleteProfile(id);
+    setProfiles(storage.getProfiles());
+    if (currentProfile.id === id) {
+      handleNew();
     }
   };
 
@@ -87,66 +47,81 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
   };
 
   return (
-    <div className="flex flex-col gap-4 p-6 bg-zinc-900/50 rounded-xl border border-zinc-800 relative">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium text-zinc-100 flex items-center gap-2">
+    <div className="flex flex-col p-7 nm-raised rounded-2xl relative">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-xl font-bold text-zinc-800 flex items-center gap-2">
           <FolderOpen size={20} className="text-zzz-orange" />
           角色档案管理
         </h2>
-        <div className="flex gap-2">
-          <button onClick={handleNew} className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors text-zinc-300" title="新建档案">
+        <div className="flex gap-5">
+          <button 
+            onClick={handleNew} 
+            className="p-3 nm-raised-interactive hover:text-zzz-orange text-zinc-500 rounded-xl transition-all" 
+            title="新建档案"
+          >
             <Plus size={18} />
           </button>
-          <button onClick={handleSave} className="p-2 bg-zzz-orange hover:opacity-90 rounded-md transition-colors text-white" title="保存当前档案">
+          <button 
+            onClick={handleSave} 
+            className="p-3 nm-orange-raised-interactive text-white rounded-xl transition-all" 
+            title="保存当前档案"
+          >
             <Save size={18} />
           </button>
-          <button onClick={() => setShowList(!showList)} className={`p-2 rounded-md transition-colors ${showList ? 'bg-zzz-orange/10 text-zzz-orange border border-zzz-orange/20' : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'}`} title="打开档案列表">
+          <button 
+            onClick={() => setShowList(!showList)} 
+            className={`p-3 rounded-xl transition-all ${showList ? 'nm-raised-active text-zzz-orange' : 'nm-raised-interactive text-zinc-500'}`} 
+            title="打开档案列表"
+          >
             <FolderOpen size={18} />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">档案名称</label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">档案名称</label>
           <input
             type="text"
             value={currentProfile.name}
             onChange={(e) => onUpdate({ ...currentProfile, name: e.target.value })}
             onFocus={(e) => e.target.select()}
-            className="bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zzz-orange"
+            className="nm-sunken rounded-lg px-3.5 py-2.5 text-sm text-zinc-700 focus:outline-none focus:border-zzz-orange/40 focus:ring-1 focus:ring-zzz-orange/25 transition-all duration-300"
           />
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">角色类型</label>
-          <select
-            value={currentProfile.type}
-            onChange={(e) => onUpdate({ ...currentProfile, type: e.target.value as CharacterType })}
-            className="bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zzz-orange"
-          >
-            <option value="ATTACK">强攻 (Attack)</option>
-            <option value="ANOMALY">异常 (Anomaly)</option>
-            <option value="STUN">命破 (Stun/Support)</option>
-          </select>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">角色类型</label>
+          <div className="relative">
+            <select
+              value={currentProfile.type}
+              onChange={(e) => onUpdate({ ...currentProfile, type: e.target.value as CharacterType })}
+              className="w-full nm-sunken rounded-lg px-3.5 py-2.5 text-sm text-zinc-700 focus:outline-none focus:border-zzz-orange/40 focus:ring-1 focus:ring-zzz-orange/25 transition-all duration-300 cursor-pointer appearance-none"
+            >
+              <option value="ATTACK">强攻</option>
+              <option value="ANOMALY">异常</option>
+              <option value="STUN">命破</option>
+            </select>
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500 text-xs">▼</div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-mono text-zinc-400 tracking-wider">配队与驱动盘信息</label>
-          <div className="overflow-x-auto bg-zinc-900/80 rounded-lg border border-zinc-800/50">
-            <table className="w-full text-sm text-left text-zinc-300 border-collapse">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-mono text-zinc-500 tracking-wider">配队与驱动盘信息</label>
+          <div className="overflow-x-auto nm-sunken rounded-xl border border-zinc-200/40 p-1">
+            <table className="w-full text-sm text-left text-zinc-700 border-collapse">
               <thead>
-                <tr className="border-b border-zinc-800">
-                  <th className="py-2 px-3 font-medium text-zinc-500 text-[10px]">角色名称</th>
-                  <th className="py-2 px-3 font-medium text-zinc-500 text-[10px]">音擎</th>
-                  <th className="py-2 px-3 font-medium text-zinc-500 text-[10px]">4件套</th>
-                  <th className="py-2 px-3 font-medium text-zinc-500 text-[10px]">2件套</th>
+                <tr className="border-b border-zinc-200/80">
+                  <th className="py-2.5 px-3.5 font-medium text-zinc-500 text-[10px]">角色名称</th>
+                  <th className="py-2.5 px-3.5 font-medium text-zinc-500 text-[10px]">音擎</th>
+                  <th className="py-2.5 px-3.5 font-medium text-zinc-500 text-[10px]">4件套</th>
+                  <th className="py-2.5 px-3.5 font-medium text-zinc-500 text-[10px]">2件套</th>
                 </tr>
               </thead>
               <tbody>
                 {[0, 1, 2].map((idx) => (
-                  <tr key={idx} className="border-b border-zinc-800/100 last:border-0">
+                  <tr key={idx} className="border-b border-zinc-200/30 last:border-0 hover:bg-zinc-200/15 transition-colors">
                     <td className="py-2 px-3">
                       <input
                         type="text"
@@ -161,7 +136,7 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
                           newTeam[idx] = { ...newTeam[idx], name: e.target.value };
                           onUpdate({ ...currentProfile, team: newTeam });
                         }}
-                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-[13px] text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
+                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-[13px] text-zinc-700 placeholder:text-zinc-400 font-medium focus:outline-none"
                         placeholder="角色"
                       />
                     </td>
@@ -179,7 +154,7 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
                           newTeam[idx] = { ...newTeam[idx], engine: e.target.value };
                           onUpdate({ ...currentProfile, team: newTeam });
                         }}
-                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-[13px] text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
+                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-[13px] text-zinc-700 placeholder:text-zinc-400 font-medium focus:outline-none"
                         placeholder="音擎"
                       />
                     </td>
@@ -197,7 +172,7 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
                           newTeam[idx] = { ...newTeam[idx], drive4: e.target.value };
                           onUpdate({ ...currentProfile, team: newTeam });
                         }}
-                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-[13px] text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
+                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-[13px] text-zinc-700 placeholder:text-zinc-400 font-medium focus:outline-none"
                         placeholder="4件套"
                       />
                     </td>
@@ -215,7 +190,7 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
                           newTeam[idx] = { ...newTeam[idx], drive2: e.target.value };
                           onUpdate({ ...currentProfile, team: newTeam });
                         }}
-                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-[13px] text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
+                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-[13px] text-zinc-700 placeholder:text-zinc-400 font-medium focus:outline-none"
                         placeholder="2件套"
                       />
                     </td>
@@ -226,13 +201,13 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
           </div>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">备注信息</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">备注信息</label>
           <textarea
             value={currentProfile.notes}
             onChange={(e) => onUpdate({ ...currentProfile, notes: e.target.value })}
-            className="bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zzz-orange h-35 resize-none placeholder:text-zinc-600"
-            placeholder="输入角色备注"
+            className="nm-sunken rounded-xl px-3.5 py-3 text-sm text-zinc-750 focus:outline-none focus:border-zzz-orange/40 focus:ring-1 focus:ring-zzz-orange/25 h-[153px] resize-none placeholder:text-zinc-500 transition-all duration-300"
+            placeholder="输入角色备注..."
           />
         </div>
       </div>
@@ -243,22 +218,20 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-4 border-t border-zinc-800 pt-4 overflow-hidden"
+            className="nm-sunken flex flex-col gap-4 max-h-80 overflow-hidden overflow-y-auto p-4 rounded-xl"
           >
-            <div className="flex flex-col gap-2 max-h-60 overflow-y-auto custom-scrollbar pr-2">
               {profiles.map((p) => (
-                <div key={p.id} className="flex items-center justify-between p-3 bg-zinc-900 rounded-lg border border-zinc-800 hover:border-zinc-700 group transition-all">
+                <div key={p.id} className="flex items-center justify-between p-3.5 nm-raised-interactive group rounded-xl">
                   <div className="flex flex-col cursor-pointer flex-1" onClick={() => { onSelect(p); setShowList(false); }}>
-                    <span className="text-sm font-medium text-zinc-200">{p.name}</span>
-                    <span className="text-xs text-zinc-500">{p.type === 'ATTACK' ? '强攻' : p.type === 'ANOMALY' ? '异常' : '命破'} · {p.updated_at?.split(' ')[0]}</span>
+                    <span className="text-sm font-semibold text-zinc-700 group-hover:text-zzz-orange transition-colors duration-200">{p.name}</span>
+                    <span className="text-xs text-zinc-500 font-mono mt-0.5">{p.type === 'ATTACK' ? '强攻' : p.type === 'ANOMALY' ? '异常' : '命破'} • {p.updated_at?.split('T')[0] || '未知时间'}</span>
                   </div>
-                  <button onClick={() => handleDelete(p.id!)} className="p-2 text-zinc-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all">
-                    <Trash2 size={16} />
+                  <button onClick={() => handleDelete(p.id!)} className="delete-btn p-3 nm-raised-interactive hover:text-red-400 rounded-xl opacity-0 group-hover:opacity-100 transition-all text-zinc-500">
+                    <Trash2 size={15} />
                   </button>
                 </div>
               ))}
-              {profiles.length === 0 && <div className="text-center py-4 text-zinc-600 text-sm">暂无保存的档案</div>}
-            </div>
+              {profiles.length === 0 && <div className="text-center py-4 text-zinc-500 text-sm">暂无保存的档案</div>}
           </motion.div>
         )}
       </AnimatePresence>

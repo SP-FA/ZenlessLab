@@ -1,6 +1,6 @@
 {
   "PORT": 3000,
   "HOST": "0.0.0.0",
-  "DB_PATH": "zenlesslab.db",
-  "VERSION": "0.4.1"
+  "DB_PATH": "zzz_calc.db",
+  "VERSION": "0.5.4"
 }

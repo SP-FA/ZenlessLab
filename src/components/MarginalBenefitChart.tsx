@@ -9,15 +9,15 @@ interface MarginalBenefitChartProps {
 }
 
 const COLORS = [
-  '#ffba04', // yellow
   '#f37f0f', // zzz-orange
-  '#ff3207', // red
+  '#3b82f6', // blue-500
+  '#f59e0b', // amber-500
   '#ef4444', // red-500
   '#8b5cf6', // violet-500
   '#ec4899', // pink-500
   '#06b6d4', // cyan-500
-  '#24ff00', // green
-  '#00ff85', // light-green
+  '#f97316', // orange-500
+  '#a855f7', // purple-500
   '#14b8a6', // teal-500
 ];
 
@@ -40,15 +40,15 @@ export const MarginalBenefitChart: React.FC<MarginalBenefitChartProps> = ({ stat
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-lg shadow-2xl min-w-[200px]">
-          <p className="text-[10px] text-zinc-500 uppercase mb-3 font-bold tracking-widest">投入第 {label} 个单位词条</p>
-          <div className="flex flex-col gap-2">
+        <div className="nm-raised p-4.5 rounded-xl shadow-xl min-w-[210px] bg-white/95 backdrop-blur-md">
+          <p className="text-[10px] font-mono text-zinc-500 uppercase mb-3 font-bold tracking-[0.15em]">投入第 {label} 个单位词条</p>
+          <div className="flex flex-col gap-2.5">
             {payload.sort((a: any, b: any) => b.value - a.value).map((entry: any) => (
               <div key={entry.name} className="flex items-center justify-between gap-4">
-                <span className="text-xs font-medium" style={{ color: entry.color }}>
+                <span className="text-xs font-semibold" style={{ color: entry.color }}>
                   {STAT_LABELS[entry.dataKey as keyof CharacterStats].split(' (')[0]}
                 </span>
-                <span className="text-xs font-mono font-bold text-zinc-100">+{entry.value.toFixed(3)}%</span>
+                <span className="text-xs font-mono font-bold text-zinc-800">+{entry.value.toFixed(3)}%</span>
               </div>
             ))}
           </div>
@@ -59,46 +59,45 @@ export const MarginalBenefitChart: React.FC<MarginalBenefitChartProps> = ({ stat
   };
 
   return (
-    <div className="w-full bg-zinc-900/30 p-8 rounded-2xl border border-zinc-800/50">
-      <div className="mb-8" align="center">
-        <h2 className="text-[30px] font-bold text-zinc-100 mb-2" size={30}>边际收益曲线</h2>
-        <p className="text-sm text-zinc-500">
-          展示在当前面板下，每额外投入一个“标准单位”词条所带来的伤害提升百分比
+    <div className="w-full nm-raised p-8 rounded-2xl">
+      <div className="mb-8 text-center">
+        <h2 className="text-xl font-bold text-zinc-805 mb-2">边际收益曲线</h2>
+        <p className="text-sm text-zinc-500 leading-relaxed">
+          展示在当前面板下，每额外投入一个单位词条所带来的<span className="font-bold">即时伤害提升百分比</span>
+          <br />
+          <span className="text-zzz-orange/85 italic text-xs font-medium">* X轴：投入 N 个单位词条 | Y轴：第 N 个单位词条带来的收益 (%)</span>
         </p>
       </div>
-      <div align="right">
-      <span className="text-zzz-orange italic text-xs">* X轴：投入的第 N 个单位词条 | Y轴：第 N 个单位带来的边际收益 (%)</span>
-      </div>
       
-      <div className="w-full h-[600px]">
+      <div className="w-full h-[600px] nm-raised rounded-xl">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 20, right: 40, left: 20, bottom: 40 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} opacity={0.5} />
+          <LineChart data={data} className="pt-15 pb-3">
+            <CartesianGrid strokeDasharray="3 3" stroke="#8a3e01" vertical={false} opacity={0.8} />
             <XAxis 
               dataKey="step" 
-              stroke="#71717a" 
+              stroke="#8e8e93" 
               fontSize={12} 
               tickLine={false} 
               axisLine={false}
               dy={10}
-              label={{ value: '投入词条单位数量 (1-20)', position: 'insideBottom', offset: -20, fontSize: 12, fill: '#71717a', fontWeight: 500 }}
+              label={{ value: '投入词条数量', position: 'insideBottom', offset: -20, fontSize: 11, fill: '#64748b', fontWeight: 600 }}
             />
             <YAxis 
-              stroke="#71717a" 
+              stroke="#8e8e93" 
               fontSize={12} 
               tickLine={false} 
               axisLine={false}
               dx={-10}
               tickFormatter={(value) => `${value}%`}
-              label={{ value: '边际收益 (%)', angle: -90, position: 'insideLeft', offset: 0, fontSize: 12, fill: '#71717a', fontWeight: 500 }}
+              label={{ value: '边际收益 (%)', angle: -90, position: 'insideLeft', offset: -10, fontSize: 11, fill: '#64748b', fontWeight: 600 }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend 
               verticalAlign="bottom" 
               align="center" 
               iconType="circle" 
-              wrapperStyle={{ paddingTop: '40px' }}
-              formatter={(value) => <span className="text-zinc-400 text-xs font-medium">{STAT_LABELS[value as keyof CharacterStats].split(' (')[0]}</span>}
+              wrapperStyle={{ top: '15px' }}
+              formatter={(value) => <span className="text-zinc-600 text-xs font-semibold">{STAT_LABELS[value as keyof CharacterStats].split(' (')[0]}</span>}
             />
             {relevantStats.map((stat, index) => (
               <Line
@@ -108,7 +107,7 @@ export const MarginalBenefitChart: React.FC<MarginalBenefitChartProps> = ({ stat
                 name={stat}
                 stroke={COLORS[index % COLORS.length]}
                 strokeWidth={3}
-                dot={{ r: 2, strokeWidth: 2, fill: '#09090b' }}
+                dot={{ r: 2, strokeWidth: 2, fill: '#ffffff' }}
                 activeDot={{ r: 6, strokeWidth: 0, fill: COLORS[index % COLORS.length] }}
                 animationDuration={1500}
               />
@@ -117,43 +116,43 @@ export const MarginalBenefitChart: React.FC<MarginalBenefitChartProps> = ({ stat
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-12 p-6 bg-zinc-950/50 rounded-xl border border-zinc-800/50">
-        <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-          <div className="w-1 h-3 bg-zzz-orange rounded-full"></div>
-          词条单位数值说明
+      <div className="mt-12 p-6 nm-sunken rounded-xl border border-zinc-200/20">
+        <h4 className="text-xs font-bold text-zinc-550 uppercase tracking-widest mb-5 flex items-center gap-2">
+          <div className="w-1.5 h-3.5 bg-zzz-orange rounded-full"></div>
+          单位词条增量参考
         </h4>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4 gap-x-8">
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-zinc-500 uppercase">战前大攻击</span>
-            <span className="text-sm font-mono text-zinc-200">3.0%</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+          <div className="flex flex-col gap-1 nm-raised p-3.5 rounded-xl border border-zinc-300/10">
+            <span className="text-[10px] text-zinc-500 font-mono tracking-wider">战前大攻击</span>
+            <span className="text-sm font-mono font-bold text-zzz-orange">3.0%</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-zinc-500 uppercase">战前小攻击</span>
-            <span className="text-sm font-mono text-zinc-200">19</span>
+          <div className="flex flex-col gap-1 nm-raised p-3.5 rounded-xl border border-zinc-300/10">
+            <span className="text-[10px] text-zinc-500 font-mono tracking-wider">战前小攻击</span>
+            <span className="text-sm font-mono font-bold text-zzz-orange">19</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-zinc-500 uppercase">暴击率</span>
-            <span className="text-sm font-mono text-zinc-200">2.4%</span>
+          <div className="flex flex-col gap-1 nm-raised p-3.5 rounded-xl border border-zinc-300/10">
+            <span className="text-[10px] text-zinc-500 font-mono tracking-wider">暴击率</span>
+            <span className="text-sm font-mono font-bold text-zzz-orange">2.4%</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-zinc-500 uppercase">暴击伤害</span>
-            <span className="text-sm font-mono text-zinc-200">4.8%</span>
+          <div className="flex flex-col gap-1 nm-raised p-3.5 rounded-xl border border-zinc-300/10">
+            <span className="text-[10px] text-zinc-500 font-mono tracking-wider">暴击伤害</span>
+            <span className="text-sm font-mono font-bold text-zzz-orange">4.8%</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-zinc-500 uppercase">穿透值</span>
-            <span className="text-sm font-mono text-zinc-200">9</span>
+          <div className="flex flex-col gap-1 nm-raised p-3.5 rounded-xl border border-zinc-300/10">
+            <span className="text-[10px] text-zinc-500 font-mono tracking-wider">穿透值</span>
+            <span className="text-sm font-mono font-bold text-zzz-orange">9</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-zinc-500 uppercase">异常精通</span>
-            <span className="text-sm font-mono text-zinc-200">9</span>
+          <div className="flex flex-col gap-1 nm-raised p-3.5 rounded-xl border border-zinc-300/10">
+            <span className="text-[10px] text-zinc-500 font-mono tracking-wider">异常精通</span>
+            <span className="text-sm font-mono font-bold text-zzz-orange">9</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-zinc-500 uppercase">增伤 / 减抗 / 减防</span>
-            <span className="text-sm font-mono text-zinc-200">3.0%</span>
+          <div className="flex flex-col gap-1 nm-raised p-3.5 rounded-xl border border-zinc-300/10">
+            <span className="text-[10px] text-zinc-500 font-mono tracking-wider">增伤 / 减抗 / 减防</span>
+            <span className="text-sm font-mono font-bold text-zzz-orange">3.0%</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-zinc-500 uppercase">穿透率</span>
-            <span className="text-sm font-mono text-zinc-200">2.4%</span>
+          <div className="flex flex-col gap-1 nm-raised p-3.5 rounded-xl border border-zinc-300/10">
+            <span className="text-[10px] text-zinc-500 font-mono tracking-wider">穿透率</span>
+            <span className="text-sm font-mono font-bold text-zzz-orange">2.4%</span>
           </div>
         </div>
       </div>
