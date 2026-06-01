@@ -218,8 +218,9 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="nm-sunken flex flex-col gap-4 max-h-80 overflow-hidden overflow-y-auto p-4 rounded-xl"
+            className="nm-sunken flex flex-col max-h-80 overflow-hidden overflow-y-auto rounded-xl"
           >
+            <div className="flex flex-col gap-4 p-4">
               {profiles.map((p) => (
                 <div key={p.id} className="flex items-center justify-between p-3.5 nm-raised-interactive group rounded-xl">
                   <div className="flex flex-col cursor-pointer flex-1" onClick={() => { onSelect(p); setShowList(false); }}>
@@ -232,6 +233,7 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
                 </div>
               ))}
               {profiles.length === 0 && <div className="text-center py-4 text-zinc-500 text-sm">暂无保存的档案</div>}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
