@@ -22,6 +22,8 @@ export default function App() {
       name: '新角色',
       type: 'ATTACK',
       stats: { ...DEFAULT_STATS },
+      char_preset: 'custom',
+      engine_preset: 'custom',
       team: [
         { name: '', engine: '', drive4: '', drive2: '' },
         { name: '', engine: '', drive4: '', drive2: '' },
@@ -100,7 +102,15 @@ export default function App() {
               <Calculator 
                 stats={currentProfile.stats} 
                 type={currentProfile.type}
-                onStatsChange={(newStats) => setCurrentProfile({ ...currentProfile, stats: newStats })}
+                profileName={currentProfile.name}
+                charPreset={currentProfile.char_preset}
+                enginePreset={currentProfile.engine_preset}
+                onStatsChange={(newStats, charPreset, enginePreset) => {
+                  const updated: CharacterProfile = { ...currentProfile, stats: newStats };
+                  if (charPreset !== undefined) updated.char_preset = charPreset;
+                  if (enginePreset !== undefined) updated.engine_preset = enginePreset;
+                  setCurrentProfile(updated);
+                }}
                 improvements={improvements}
                 onImprovementsChange={setImprovements}
               />

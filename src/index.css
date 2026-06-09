@@ -46,7 +46,7 @@ body {
 
 .nm-raised-big {
   background-color: #f4f6f9;
-  box-shadow: 6px 6px 6px #d1d9e6, -6px -6px 6px #ffffff;
+  box-shadow: 4px 4px 6px #d1d9e6, -4px -4px 6px #ffffff;
 }
 
 .nm-raised-active {

@@ -37,6 +37,8 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
       name: '新档案',
       type: 'ATTACK',
       stats: { ...DEFAULT_STATS },
+      char_preset: 'custom',
+      engine_preset: 'custom',
       team: [
         { name: '', engine: '', drive4: '', drive2: '' },
         { name: '', engine: '', drive4: '', drive2: '' },

@@ -38,6 +38,8 @@ export interface CharacterProfile {
   team?: TeamMember[];
   notes: string;
   updated_at?: string;
+  char_preset?: string;
+  engine_preset?: string;
 }
 
 export const DEFAULT_STATS: CharacterStats = {
