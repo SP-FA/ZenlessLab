@@ -42,6 +42,23 @@ export interface CharacterProfile {
   engine_preset?: string;
 }
 
+export interface DriveDiscSubStat {
+  name: string;
+  hits: number;
+  value: number;
+}
+
+export interface DriveDisc {
+  id: string;
+  setName: string;
+  slot: number;
+  mainStatName: string;
+  level: number;
+  mainStatValue: number;
+  subStats: DriveDiscSubStat[];
+  updated_at?: string;
+}
+
 export const DEFAULT_STATS: CharacterStats = {
   atk_base: 0, atk_flat_pre: 0, atk_pct_pre: 0, atk_flat_post: 0, atk_pct_post: 0,
   hp_base: 0, hp_flat_pre: 0, hp_pct_pre: 0, hp_flat_post: 0, hp_pct_post: 0,

@@ -69,9 +69,9 @@ export const MarginalBenefitChart: React.FC<MarginalBenefitChartProps> = ({ stat
         </p>
       </div>
       
-      <div className="w-full h-[600px] nm-raised rounded-xl">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} className="pt-15 pb-3">
+      <div className="w-full h-[600px]">
+        <ResponsiveContainer className="nm-raised rounded-xl pt-12 pb-5 pl-10 pr-10">
+          <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="#8a3e01" vertical={false} opacity={0.8} />
             <XAxis 
               dataKey="step" 
@@ -89,7 +89,7 @@ export const MarginalBenefitChart: React.FC<MarginalBenefitChartProps> = ({ stat
               axisLine={false}
               dx={-10}
               tickFormatter={(value) => `${value}%`}
-              label={{ value: '边际收益 (%)', angle: -90, position: 'insideLeft', offset: -10, fontSize: 11, fill: '#64748b', fontWeight: 600 }}
+              label={{ value: '边际收益 (%)', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#64748b', fontWeight: 600 }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend 

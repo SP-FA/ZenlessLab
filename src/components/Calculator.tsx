@@ -108,7 +108,7 @@ export const Calculator: React.FC<CalculatorProps> = ({
       const newStats = {
         ...stats,
         hp_base: char.baseHp,
-        atk_base: char.baseAtk + engineAtk
+        atk_base: char.baseAtk + engineAtk + 75
       };
       onStatsChange(newStats, charName, displayWEngineName);
     }
@@ -125,7 +125,7 @@ export const Calculator: React.FC<CalculatorProps> = ({
       const charAtk = currentChar ? currentChar.baseAtk : 0;
       const newStats = {
         ...stats,
-        atk_base: charAtk + engine.baseAtk
+        atk_base: charAtk + engine.baseAtk + 75
       };
       onStatsChange(newStats, displayCharName, engineName);
     }
@@ -246,7 +246,7 @@ export const Calculator: React.FC<CalculatorProps> = ({
         <div className="p-7 nm-raised rounded-2xl">
           <div className="relative overflow-hidden flex flex-col items-center justify-center py-7 nm-sunken rounded-2xl border border-zinc-200/50 mb-6 group cursor-default transition-all duration-300 hover:border-zzz-orange/15">
             <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-[0.25em] mb-2.5 group-hover:text-zzz-orange transition-colors duration-300">当前伤害期望</span>
-            <span className="text-5xl font-mono font-black text-zzz-orange drop-shadow-[0_0_15px_rgba(243,127,15,0.25)] select-all tracking-tight tabular-nums">
+            <span className="text-5xl font-black text-zzz-orange drop-shadow-[0_0_15px_rgba(243,127,15,0.25)] select-all tracking-tight tabular-nums">
               {currentDamage.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </span>
           </div>

@@ -7,11 +7,12 @@ import { FormulaView } from './components/FormulaView';
 import { Docs } from './components/Docs';
 import { Me } from './components/About';
 import { MarginalBenefitChart } from './components/MarginalBenefitChart';
-import { LayoutDashboard, Calculator as CalcIcon, BookOpen, FileCode, AtSign, Github, TrendingUp } from 'lucide-react';
+import { DriveManager } from './components/DriveManager';
+import { LayoutDashboard, Calculator as CalcIcon, BookOpen, FileCode, AtSign, Github, TrendingUp, Disc } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { storage } from './services/storage';
 
-type Tab = 'CALC' | 'CURVE' | 'FORMULA' | 'DOCS' | 'ME';
+type Tab = 'CALC' | 'CURVE' | 'DRIVE' | 'FORMULA' | 'DOCS' | 'ME';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('CALC');
@@ -41,6 +42,7 @@ export default function App() {
   const menuItems = [
     { id: 'CALC', label: '计算分析', icon: CalcIcon },
     { id: 'CURVE', label: '收益曲线', icon: TrendingUp },
+    { id: 'DRIVE', label: '驱动盘', icon: Disc },
     { id: 'FORMULA', label: '计算公式', icon: FileCode },
     { id: 'DOCS', label: '指南文档', icon: BookOpen },
     { id: 'ME', label: 'About', icon: AtSign },
@@ -114,6 +116,17 @@ export default function App() {
                 improvements={improvements}
                 onImprovementsChange={setImprovements}
               />
+            </motion.div>
+          )}
+
+          {activeTab === 'DRIVE' && (
+            <motion.div
+              key="drive"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <DriveManager />
             </motion.div>
           )}
 

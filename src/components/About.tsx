@@ -111,6 +111,10 @@ export const Me: React.FC = () => {
                 <CheckCircle className="text-[#00aa00] shrink-0" size={14} />
                 <span className="line-through text-zinc-600">桌面端与PWA离线化架构注入</span>
               </div>
+              <div className="flex items-center gap-2.5">
+                <CheckCircle className="text-[#00aa00] shrink-0" size={14} />
+                <span>自动拉取各角色白值</span>
+              </div>
             </div>
 
             <div className="space-y-3">
@@ -121,10 +125,6 @@ export const Me: React.FC = () => {
               <div className="flex items-center gap-2.5">
                 <Circle className="text-zzz-orange/70 shrink-0" size={14} />
                 <span>加入异放机制</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Circle className="text-zzz-orange/70 shrink-0" size={14} />
-                <span>自动拉取各角色白值</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Circle className="text-zzz-orange/70 shrink-0" size={14} />

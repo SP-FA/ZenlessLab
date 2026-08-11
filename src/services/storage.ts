@@ -1,7 +1,8 @@
-import { CharacterProfile } from '../types';
+import { CharacterProfile, DriveDisc } from '../types';
 import { CHARACTER_PRESETS, WENGINE_PRESETS } from '../utils/presets';
 
 const STORAGE_KEY = 'zzz_analyzer_profiles';
+const DISC_STORAGE_KEY = 'zzz_analyzer_drive_discs';
 
 function matchPresets(hp: number, atk: number): { char_preset: string; engine_preset: string } {
   // 1. Try to find a perfect combination of character + engine where baseHp matches character baseHp
@@ -101,6 +102,45 @@ export const storage = {
     const profiles = storage.getProfiles();
     const filtered = profiles.filter(p => p.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  },
+
+  getDriveDiscs: (): DriveDisc[] => {
+    const data = localStorage.getItem(DISC_STORAGE_KEY);
+    if (!data) return [];
+    try {
+      return JSON.parse(data) as DriveDisc[];
+    } catch (e) {
+      console.error('Failed to parse drive disc storage data', e);
+      return [];
+    }
+  },
+
+  saveDriveDisc: (disc: DriveDisc): DriveDisc => {
+    const discs = storage.getDriveDiscs();
+    const now = new Date().toISOString();
+    let updatedDisc: DriveDisc;
+
+    if (disc.id) {
+      updatedDisc = { ...disc, updated_at: now };
+      const index = discs.findIndex(d => d.id === disc.id);
+      if (index !== -1) {
+        discs[index] = updatedDisc;
+      } else {
+        discs.push(updatedDisc);
+      }
+    } else {
+      const newId = 'disc_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+      updatedDisc = { ...disc, id: newId, updated_at: now };
+      discs.push(updatedDisc);
+    }
+
+    localStorage.setItem(DISC_STORAGE_KEY, JSON.stringify(discs));
+    return updatedDisc;
+  },
+
+  deleteDriveDisc: (id: string): void => {
+    const discs = storage.getDriveDiscs();
+    const filtered = discs.filter(d => d.id !== id);
+    localStorage.setItem(DISC_STORAGE_KEY, JSON.stringify(filtered));
   }
 };
-
