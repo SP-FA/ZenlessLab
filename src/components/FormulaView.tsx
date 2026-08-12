@@ -97,6 +97,9 @@ export const FormulaView: React.FC = () => {
               </span>
               <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
                 <span className="font-bold">基础防御力</span> &times; (1 + 敌人防御加成% - <span className="text-[#06b6d4] font-bold">减防%</span>) + 固定防御
+                <div className="text-[10px] text-zinc-550 mt-2 font-sans">
+                  * 计算减防收益时，减防按 100% 封顶；超过 100% 的部分不再提供额外收益
+                </div>
               </div>
             </div>
             <div className="p-6 nm-raised rounded-xl">
@@ -106,6 +109,9 @@ export const FormulaView: React.FC = () => {
               </span>
               <div className="bg-[#e9ebf0]/80 p-3 rounded-lg border border-zinc-300/40 font-mono text-xs text-zinc-700 leading-relaxed">
                 <span className="font-bold">标准等级基数</span> / (<span className="font-bold">敌人防御力</span> &times; (1 - <span className="text-[#06bc0a] font-bold">穿透率%</span>) - <span className="text-[#05b669] font-bold">穿透值</span> + <span className="font-bold">标准等级基数</span>)
+                <div className="text-[10px] text-zinc-550 mt-2 font-sans">
+                  * 计算穿透率收益时，穿透率按 100% 封顶；超过 100% 的部分不再提供额外收益
+                </div>
               </div>
             </div>
           </div>

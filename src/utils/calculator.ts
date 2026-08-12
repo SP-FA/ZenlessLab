@@ -48,6 +48,13 @@ export const calculateDamage = (stats: CharacterStats, type: CharacterType) => {
   return damage;
 };
 
+// 计算词条收益时，穿透率与减防按 100% 封顶，超出的提升不再带来额外收益。
+const applyDefenseBenefitCap = (stats: CharacterStats, statKey: keyof CharacterStats) => {
+  if (statKey !== 'pen_ratio' && statKey !== 'def_shred') return stats;
+
+  return { ...stats, [statKey]: Math.min(100, stats[statKey]) };
+};
+
 export const calculateGain = (baseStats: CharacterStats, improvements: Partial<CharacterStats>, type: CharacterType) => {
   const originalDmg = calculateDamage(baseStats, type);
   
@@ -55,7 +62,10 @@ export const calculateGain = (baseStats: CharacterStats, improvements: Partial<C
 
   Object.keys(improvements).forEach((key) => {
     const statKey = key as keyof CharacterStats;
-    const improvedStats = { ...baseStats, [statKey]: baseStats[statKey] + (improvements[statKey] || 0) };
+    const improvedStats = applyDefenseBenefitCap(
+      { ...baseStats, [statKey]: baseStats[statKey] + (improvements[statKey] || 0) },
+      statKey,
+    );
     const newDmg = calculateDamage(improvedStats, type);
     
     // 收益 = 提升后伤害 / 原伤害 - 1 (用户公式 1 - 提升后/原伤害 可能是笔误，通常收益为正)
@@ -104,7 +114,10 @@ export const generateCurveData = (baseStats: CharacterStats, type: CharacterType
     Object.entries(STAT_ROLL_UNITS).forEach(([key, unit]) => {
       if (unit === 0) return;
       const statKey = key as keyof CharacterStats;
-      const improvedStats = { ...baseStats, [statKey]: baseStats[statKey] + (unit * i) };
+      const improvedStats = applyDefenseBenefitCap(
+        { ...baseStats, [statKey]: baseStats[statKey] + (unit * i) },
+        statKey,
+      );
       const newDmg = calculateDamage(improvedStats, type);
       point[statKey] = Number(((newDmg / originalDmg - 1) * 100).toFixed(2));
     });
@@ -128,11 +141,17 @@ export const generateMarginalCurveData = (baseStats: CharacterStats, type: Chara
       const unit = STAT_ROLL_UNITS[statKey];
       
       // Damage with (i-1) units
-      const prevStats = { ...baseStats, [statKey]: baseStats[statKey] + (unit * (i - 1)) };
+      const prevStats = applyDefenseBenefitCap(
+        { ...baseStats, [statKey]: baseStats[statKey] + (unit * (i - 1)) },
+        statKey,
+      );
       const prevDmg = calculateDamage(prevStats, type);
       
       // Damage with i units
-      const currentStats = { ...baseStats, [statKey]: baseStats[statKey] + (unit * i) };
+      const currentStats = applyDefenseBenefitCap(
+        { ...baseStats, [statKey]: baseStats[statKey] + (unit * i) },
+        statKey,
+      );
       const currentDmg = calculateDamage(currentStats, type);
       
       if (prevDmg === 0) {

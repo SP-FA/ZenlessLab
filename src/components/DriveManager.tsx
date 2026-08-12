@@ -7,6 +7,7 @@ import {
 import { DriveDisc, DriveDiscSubStat } from '../types';
 import { storage } from '../services/storage';
 import { DRIVE_DISC_PRESETS, DriveDiscPreset } from '../utils/presets';
+import { NeoSelect } from './NeoSelect';
 
 // Main stat configuration with game-accurate progression mapping
 const MAIN_STATS_CONFIG: Record<string, { base: number; max: number; unit: string; allowedSlots: number[] }> = {
@@ -82,6 +83,7 @@ export function DriveManager() {
     { name: '攻击力 (%)', hits: 0 },
     { name: '暴击率 (%)', hits: 0 },
   ]);
+  const [isFormSetEffectOpen, setIsFormSetEffectOpen] = useState(false);
 
   // Edit Panel / Popup state (For separate edit logic)
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -90,6 +92,7 @@ export function DriveManager() {
   const [editLevel, setEditLevel] = useState<number>(15);
   const [editMainStatName, setEditMainStatName] = useState<string>('固定生命值');
   const [editSubStats, setEditSubStats] = useState<Omit<DriveDiscSubStat, 'value'>[]>([]);
+  const [isEditSetEffectOpen, setIsEditSetEffectOpen] = useState(false);
 
   // Loading discs on mount
   useEffect(() => {
@@ -450,33 +453,34 @@ export function DriveManager() {
             </div>
           </div>
 
-          {/* Form attributes configurations and specs - Now occupies 7 Columns */}
-          <div className="lg:col-span-7 p-5 rounded-xl flex flex-col gap-5 nm-raised">
-            <div className="flex items-center justify-between pb-1">
+          {/* Compact property editor keeps the creation workflow distinct from editing. */}
+          <div className="lg:col-span-7 p-5 rounded-xl flex flex-col gap-4 nm-raised">
+            <div className="flex items-center justify-between">
               <span className="text-xs font-black text-zinc-600 flex items-center gap-1.5 uppercase">
                 驱动盘属性
               </span>
-              <span className="text-[9px] font-black text-white px-2 py-0.5 rounded" style={{ backgroundColor: currentPreset.color }}>
-                  {currentPreset.name}
-              </span>
+              <button type="button" onClick={() => setIsFormSetEffectOpen(!isFormSetEffectOpen)} className="flex items-center gap-1.5 text-[10px] font-black text-zinc-500 hover:text-zinc-800">
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: currentPreset.color }} />
+                {currentPreset.name} · 套装效果
+                <ChevronRight size={12} className={`transition-transform ${isFormSetEffectOpen ? 'rotate-90' : ''}`} />
+              </button>
             </div>
 
-            {/* Selected Preset Info overview summary board */}
-            <div className="p-3.5 rounded-xl nm-sunken bg-white/40 border border-zinc-200/10 flex flex-col gap-1.5">
-              <div className="text-[11px] leading-relaxed text-zinc-600 font-medium mt-1">
-                <p><strong className="text-zinc-700">【2件套】</strong>{currentPreset.twoPieceEffect}</p>
-                <p className="line-clamp-2"><strong className="text-zinc-700">【4件套】</strong>{currentPreset.fourPieceEffect}</p>
+            {isFormSetEffectOpen && (
+              <div className="px-3 py-2.5 rounded-lg bg-zinc-100/70 text-[11px] leading-relaxed text-zinc-600 space-y-1">
+                <p><strong className="text-zinc-700">2件套：</strong>{currentPreset.twoPieceEffect}</p>
+                <p><strong className="text-zinc-700">4件套：</strong>{currentPreset.fourPieceEffect}</p>
               </div>
-            </div>
+            )}
 
             {/* Inputs & settings */}
             <form onSubmit={handleAddSubmit} className="flex flex-col gap-4">
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 nm-sunken p-4 rounded-xl">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end px-1 py-3 border-y border-zinc-200/70">
                 {/* Slot Selector */}
-                <div>
-                  <label className="block text-xs font-black text-zinc-500 mb-2">驱动盘槽位</label>
-                  <div className="grid grid-cols-6 gap-1 nm-sunken p-1 rounded-xl bg-zinc-100">
+                <div className="md:col-span-5">
+                  <label className="block text-[10px] font-black text-zinc-400 mb-1.5">槽位</label>
+                  <div className="grid grid-cols-6 gap-1">
                     {[1, 2, 3, 4, 5, 6].map(num => (
                       <button
                         key={num}
@@ -484,8 +488,8 @@ export function DriveManager() {
                         onClick={() => setFormSlot(num)}
                         className={`py-1.5 rounded-lg text-xs font-black font-mono transition-all duration-200 ${
                           formSlot === num 
-                            ? 'text-white bg-zinc-800 shadow-inner scale-105' 
-                            : 'text-zinc-500 hover:text-zinc-800'
+                            ? 'text-white bg-zinc-800 nm-raised-active'
+                            : 'text-zinc-500 bg-zinc-100 hover:bg-zinc-200'
                         }`}
                       >
                         {num}
@@ -495,9 +499,9 @@ export function DriveManager() {
                 </div>
 
                 {/* Level slider */}
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-xs font-black text-zinc-500">等级</label>
+                <div className="md:col-span-7">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-[10px] font-black text-zinc-400">等级</label>
                     <span className="text-xs font-black font-mono text-zzz-orange bg-zzz-orange/10 px-2 py-0.5 rounded-md">
                       + {formLevel}
                     </span>
@@ -516,37 +520,23 @@ export function DriveManager() {
                 </div>
               </div>
 
-              {/* Main Attributes selection */}
-              <div className="p-4 nm-sunken rounded-xl">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="block text-xs font-black text-zinc-500 mb-2">
-                    主词条
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 gap-2">
-                  <select
+              {/* Main attribute is a compact field instead of its own card. */}
+              <div className="grid grid-cols-1 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center gap-2 px-1">
+                <span className="text-[10px] font-black text-zinc-400">主词条</span>
+                  <NeoSelect
                     value={formMainStatName}
-                    onChange={(e) => setFormMainStatName(e.target.value)}
-                    className="w-full text-xs font-bold bg-[#f0f3f6] text-zinc-800 p-2.5 rounded-lg border border-zinc-200 focus:outline-none"
-                  >
-                    {getMainStatsForSlot(formSlot).map(stat => (
-                      <option key={stat} value={stat}>{stat}</option>
-                    ))}
-                  </select>
-
-                  <div className="mt-1 flex items-center justify-between text-zinc-700 p-3 rounded-lg text-xs nm-raised">
-                    <span className="font-bold text-zinc-400">主词条最终结果:</span>
-                    <span className="font-black font-mono text-zinc-800">
-                      +{computedMainValue}{MAIN_STATS_CONFIG[formMainStatName]?.unit}
-                    </span>
-                  </div>
-                </div>
+                    onValueChange={(name) => setFormMainStatName(name as string)}
+                    buttonClassName="text-xs font-bold"
+                    options={getMainStatsForSlot(formSlot).map(stat => ({ value: stat, label: stat }))}
+                    ariaLabel="主词条"
+                  />
+                <span className="text-xs font-black font-mono text-zinc-800 sm:text-right">+{computedMainValue}{MAIN_STATS_CONFIG[formMainStatName]?.unit}</span>
               </div>
 
-              {/* Sub-Atrributes Area */}
-              <div className="flex flex-col gap-3 nm-sunken rounded-xl p-4">
+              {/* Sub stats use compact rows, retaining every control and value. */}
+              <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center">
-                  <span className="block text-xs font-black text-zinc-500 mb-2">
+                  <span className="block text-xs font-black text-zinc-500">
                     副词条
                   </span>
                   {formSubStats.length < 4 && (
@@ -560,46 +550,35 @@ export function DriveManager() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="rounded-xl border border-zinc-200/70 overflow-hidden divide-y divide-zinc-200/70">
                   {formSubStats.map((sub, idx) => {
                     const formatUnit = SUB_STATS_CONFIG[sub.name]?.unit || '';
                     const totalRolls = sub.hits + 1;
                     const statValue = calculateSubStatValue(sub.name, sub.hits);
 
                     return (
-                      <div key={idx} className="p-3 nm-raised rounded-xl flex flex-col relative">
+                      <div key={idx} className="grid grid-cols-[1rem_minmax(0,1fr)_minmax(7rem,1.4fr)_auto_auto] items-center gap-2 px-3 py-2.5 bg-white/20">
                         {/* Remove card button */}
                         <button
                           type="button"
                           onClick={() => handleRemoveSubStat(idx)}
-                          className="absolute right-2 top-2 p-1 text-zinc-400 hover:text-red-500 transition-colors"
+                          className="p-1 text-zinc-400 hover:text-red-500 transition-colors"
                         >
                           <X size={11} />
                         </button>
 
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold text-zinc-400 font-mono">#{idx+1}</span>
-                          <select
+                          <span className="text-[10px] font-bold text-zinc-400 font-mono">{idx+1}</span>
+                          <NeoSelect
                             value={sub.name}
-                            onChange={(e) => handleSubStatChange(idx, { name: e.target.value })}
-                            className="text-xs font-bold bg-transparent text-zinc-700 focus:outline-none cursor-pointer hover:text-zinc-900"
-                          >
-                            {getAvailableSubStats(idx).map(opt => (
-                              <option key={opt} value={opt}>{opt}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        {/* Slider section and values */}
-                        <div className="p-2 rounded-lg mt-1 flex flex-col gap-1.5">
-                          <div className="flex justify-between items-center text-[10px] font-mono">
-                            <span className="text-zinc-500 font-sans pb-1">
-                              强化: <strong className="text-zzz-orange font-black">+{sub.hits}</strong>
-                            </span>
-                            <span className="text-zinc-800 font-black text-xs">
-                              +{statValue}{formatUnit}
-                            </span>
-                          </div>
+                            onValueChange={(name) => handleSubStatChange(idx, { name })}
+                            className="min-w-0 flex-1"
+                            buttonClassName="min-h-0 bg-transparent px-0 py-0 text-xs font-bold shadow-none hover:shadow-none"
+                            menuClassName="min-w-[10rem]"
+                            options={getAvailableSubStats(idx).map(opt => ({ value: opt, label: opt }))}
+                            ariaLabel={`副词条 ${idx + 1}`}
+                          />
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-[10px] text-zinc-500 whitespace-nowrap">强化 <strong className="text-zzz-orange">+{sub.hits}</strong></span>
                           <input
                             type="range"
                             min="0"
@@ -610,12 +589,13 @@ export function DriveManager() {
                             className="w-full h-1 bg-zinc-300 rounded-lg appearance-none cursor-pointer accent-zinc-700"
                           />
                         </div>
+                        <span className="text-zinc-800 font-black text-xs font-mono whitespace-nowrap">+{statValue}{formatUnit}</span>
                       </div>
                     );
                   })}
 
                   {formSubStats.length === 0 && (
-                    <div className="col-span-2 text-center py-5 rounded-xl text-xs text-zinc-400">
+                    <div className="text-center py-5 text-xs text-zinc-400">
                       未添加副词条。请点击右上角进行添加。
                     </div>
                   )}
@@ -658,31 +638,31 @@ export function DriveManager() {
             {/* Slot select filter */}
             <div>
               <label className="block text-[10px] font-black text-zinc-400 uppercase mb-1.5">槽位筛选</label>
-              <select
+              <NeoSelect
                 value={slotFilter}
-                onChange={(e) => setSlotFilter(e.target.value === 'ALL' ? 'ALL' : parseInt(e.target.value))}
-                className="w-full text-xs font-bold bg-[#f0f3f6] text-zinc-700 p-3 rounded-xl border border-zinc-200 focus:outline-none hover:border-zinc-300 transition-all cursor-pointer"
-              >
-                <option value="ALL">所有槽位</option>
-                {[1, 2, 3, 4, 5, 6].map(num => (
-                  <option key={num} value={num}>{num} 号盘</option>
-                ))}
-              </select>
+                onValueChange={(slot) => setSlotFilter(slot as number | 'ALL')}
+                buttonClassName="text-xs font-bold"
+                options={[
+                  { value: 'ALL', label: '所有槽位' },
+                  ...[1, 2, 3, 4, 5, 6].map(num => ({ value: num, label: `${num} 号盘` })),
+                ]}
+                ariaLabel="槽位筛选"
+              />
             </div>
 
             {/* Set filter */}
             <div>
               <label className="block text-[10px] font-black text-zinc-400 uppercase mb-1.5">套装筛选</label>
-              <select
+              <NeoSelect
                 value={setFilter}
-                onChange={(e) => setSetFilter(e.target.value)}
-                className="w-full text-xs font-bold bg-[#f0f3f6] text-zinc-700 p-3 rounded-xl border border-zinc-200 focus:outline-none hover:border-zinc-300 transition-all cursor-pointer"
-              >
-                <option value="ALL">所有套装</option>
-                {availableFilterSets.map(setName => (
-                  <option key={setName} value={setName}>{setName}</option>
-                ))}
-              </select>
+                onValueChange={(setName) => setSetFilter(setName as string)}
+                buttonClassName="text-xs font-bold"
+                options={[
+                  { value: 'ALL', label: '所有套装' },
+                  ...availableFilterSets.map(setName => ({ value: setName, label: setName })),
+                ]}
+                ariaLabel="套装筛选"
+              />
             </div>
           </div>
         </div>
@@ -881,17 +861,22 @@ export function DriveManager() {
                   </div>
                 </div>
 
-                {/* Info overview board */}
-                <div className="p-3.5 rounded-xl nm-sunken flex flex-col gap-1 text-[11px] text-zinc-600">
-                  <p><strong className="text-zinc-800">【二件套】</strong>{currentEditPreset.twoPieceEffect}</p>
-                  <p><strong className="text-zinc-800">【四件套】</strong>{currentEditPreset.fourPieceEffect}</p>
+              <button type="button" onClick={() => setIsEditSetEffectOpen(!isEditSetEffectOpen)} className="flex items-center justify-between px-1 text-[10px] font-black text-zinc-500 hover:text-zinc-800">
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: currentEditPreset.color }} />{currentEditPreset.name} · 套装效果</span>
+                <ChevronRight size={12} className={`transition-transform ${isEditSetEffectOpen ? 'rotate-90' : ''}`} />
+              </button>
+              {isEditSetEffectOpen && (
+                <div className="px-3 py-2.5 rounded-lg bg-zinc-100/70 text-[11px] leading-relaxed text-zinc-600 space-y-1">
+                  <p><strong className="text-zinc-800">2件套：</strong>{currentEditPreset.twoPieceEffect}</p>
+                  <p><strong className="text-zinc-800">4件套：</strong>{currentEditPreset.fourPieceEffect}</p>
                 </div>
+              )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 nm-sunken p-4 rounded-xl">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end px-1 py-3 border-y border-zinc-200/70">
                   {/* Slot selector */}
-                  <div>
-                    <label className="block text-xs font-black text-zinc-500 mb-2">驱动盘槽位</label>
-                    <div className="grid grid-cols-6 gap-1 nm-sunken p-1 rounded-xl">
+                  <div className="md:col-span-5">
+                    <label className="block text-[10px] font-black text-zinc-400 mb-1.5">槽位</label>
+                    <div className="grid grid-cols-6 gap-1">
                       {[1, 2, 3, 4, 5, 6].map(num => (
                         <button
                           key={num}
@@ -899,8 +884,8 @@ export function DriveManager() {
                           onClick={() => setEditSlot(num)}
                           className={`py-1.5 rounded-lg text-xs font-black font-mono transition-all duration-200 ${
                             editSlot === num 
-                              ? 'text-white bg-zinc-800 shadow-inner scale-105' 
-                              : 'text-zinc-500 hover:text-zinc-800'
+                              ? 'text-white bg-zinc-800 nm-raised-active'
+                            : 'text-zinc-500 bg-zinc-100 hover:bg-zinc-200'
                           }`}
                         >
                           {num}
@@ -910,9 +895,9 @@ export function DriveManager() {
                   </div>
 
                   {/* Level selector */}
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <label className="text-xs font-black text-zinc-500 font-sans">等级</label>
+                  <div className="md:col-span-7">
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="text-[10px] font-black text-zinc-400 font-sans">等级</label>
                       <span className="text-xs font-black font-mono text-zzz-orange bg-zzz-orange/10 px-2 py-0.5 rounded-md">
                         + {editLevel}
                       </span>
@@ -931,33 +916,21 @@ export function DriveManager() {
                   </div>
                 </div>
 
-                {/* Main Stat selection block */}
-                <div className="p-4 nm-sunken rounded-xl">
-                  <span className="block text-xs font-black text-zinc-500 mb-2">
-                    主词条
-                  </span>
-                  <div className="grid grid-cols-1 gap-2">
-                    <select
+                {/* Main stat stays visible in a single concise row. */}
+                <div className="grid grid-cols-1 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center gap-2 px-1">
+                  <span className="text-[10px] font-black text-zinc-400">主词条</span>
+                    <NeoSelect
                       value={editMainStatName}
-                      onChange={(e) => setEditMainStatName(e.target.value)}
-                      className="w-full text-xs font-bold text-zinc-800 p-2.5 rounded-lg border border-zinc-200 focus:outline-none"
-                    >
-                      {getMainStatsForSlot(editSlot).map(stat => (
-                        <option key={stat} value={stat}>{stat}</option>
-                      ))}
-                    </select>
-
-                    <div className="mt-1 flex items-center justify-between text-zinc-700 px-3 py-1.5 rounded-lg text-xs">
-                      <span className="font-bold text-zinc-400">更改后的主属性:</span>
-                      <span className="font-black font-mono text-zinc-800">
-                        +{computedEditMainValue}{MAIN_STATS_CONFIG[editMainStatName]?.unit}
-                      </span>
-                    </div>
-                  </div>
+                      onValueChange={(name) => setEditMainStatName(name as string)}
+                      buttonClassName="text-xs font-bold"
+                      options={getMainStatsForSlot(editSlot).map(stat => ({ value: stat, label: stat }))}
+                      ariaLabel="编辑主词条"
+                    />
+                  <span className="text-xs font-black font-mono text-zinc-800 sm:text-right">+{computedEditMainValue}{MAIN_STATS_CONFIG[editMainStatName]?.unit}</span>
                 </div>
 
-                {/* Sub attribute configuration area inside edit portal */}
-                <div className="flex flex-col gap-3 nm-sunken p-4 rounded-xl">
+                {/* Compact rows replace nested sub-stat cards. */}
+                <div className="flex flex-col gap-2">
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-black text-zinc-500 uppercase flex items-center gap-1">
                       副词条
@@ -973,44 +946,34 @@ export function DriveManager() {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="rounded-xl border border-zinc-200/70 overflow-hidden divide-y divide-zinc-200/70">
                     {editSubStats.map((sub, idx) => {
                       const formatUnit = SUB_STATS_CONFIG[sub.name]?.unit || '';
                       const totalRolls = sub.hits + 1;
                       const statValue = calculateSubStatValue(sub.name, sub.hits);
 
                       return (
-                        <div key={idx} className="p-3 nm-raised rounded-xl bg-[#f0f3f6] flex flex-col gap-2 relative border border-zinc-200/10">
+                        <div key={idx} className="grid grid-cols-[1rem_minmax(0,1fr)_minmax(7rem,1.4fr)_auto_auto] items-center gap-2 px-3 py-2.5 bg-white/20">
                           <button
                             type="button"
                             onClick={() => handleRemoveEditSubStat(idx)}
-                            className="absolute right-2 top-2 p-1 text-zinc-400 hover:text-red-500 transition-colors"
+                            className="p-1 text-zinc-400 hover:text-red-500 transition-colors"
                           >
                             <X size={11} />
                           </button>
 
-                          <div className="flex items-center gap-2 pr-4">
-                            <span className="text-[10px] font-bold text-zinc-400 font-mono">#{idx+1}</span>
-                            <select
+                            <span className="text-[10px] font-bold text-zinc-400 font-mono">{idx+1}</span>
+                            <NeoSelect
                               value={sub.name}
-                              onChange={(e) => handleEditSubStatChange(idx, { name: e.target.value })}
-                              className="text-xs font-bold text-zinc-700 focus:outline-none cursor-pointer pb-0.5 hover:text-zinc-900"
-                            >
-                              {getAvailableEditSubStats(idx).map(opt => (
-                                <option key={opt} value={opt}>{opt}</option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <div className="p-2 rounded-lg flex flex-col gap-1.5">
-                            <div className="flex justify-between items-center text-[10px] font-mono">
-                              <span className="text-zinc-500 font-sans pb-1">
-                                强化: <strong className="text-zzz-orange font-black">+{sub.hits}</strong> ({totalRolls}跳)
-                              </span>
-                              <span className="text-zinc-800 font-black text-xs">
-                                +{statValue}{formatUnit}
-                              </span>
-                            </div>
+                              onValueChange={(name) => handleEditSubStatChange(idx, { name })}
+                              className="min-w-0 flex-1"
+                              buttonClassName="min-h-0 bg-transparent px-0 py-0 text-xs font-bold shadow-none hover:shadow-none"
+                              menuClassName="min-w-[10rem]"
+                              options={getAvailableEditSubStats(idx).map(opt => ({ value: opt, label: opt }))}
+                              ariaLabel={`编辑副词条 ${idx + 1}`}
+                            />
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-[10px] text-zinc-500 whitespace-nowrap">强化 <strong className="text-zzz-orange">+{sub.hits}</strong></span>
                             <input
                               type="range"
                               min="0"
@@ -1021,12 +984,13 @@ export function DriveManager() {
                               className="w-full h-1 bg-zinc-300 rounded-lg appearance-none cursor-pointer accent-zinc-700"
                             />
                           </div>
+                          <span className="text-zinc-800 font-black text-xs font-mono whitespace-nowrap">+{statValue}{formatUnit}</span>
                         </div>
                       );
                     })}
 
                     {editSubStats.length === 0 && (
-                      <div className="col-span-2 text-center py-5 bg-zinc-100/50 rounded-xl border border-dashed border-zinc-200 text-xs text-zinc-400">
+                      <div className="text-center py-5 bg-zinc-100/50 text-xs text-zinc-400">
                         该盘片无副属性词条，请在右上角添加副属性。
                       </div>
                     )}

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { CharacterStats, CharacterType, STAT_LABELS } from '../types';
 import { calculateDamage, calculateGain } from '../utils/calculator';
 import { StatInput } from './StatInput';
+import { NeoSelect } from './NeoSelect';
 import { CHARACTER_PRESETS, WENGINE_PRESETS } from '../utils/presets';
 import { TrendingUp, Compass, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -156,42 +157,32 @@ export const Calculator: React.FC<CalculatorProps> = ({
               <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
                 <span className="mb-2">👤 代理人白值</span>
               </label>
-              <div className="relative">
-                <select
-                  value={displayCharName}
-                  onChange={(e) => handleCharPresetChange(e.target.value)}
-                  className="w-full nm-raised rounded-lg px-3.5 py-2.5 text-sm text-zinc-700 focus:outline-none focus:ring-1 focus:ring-zzz-orange/25 cursor-pointer appearance-none"
-                >
-                  <option value="custom">⚙️ 自定义代理人数据</option>
-                  {CHARACTER_PRESETS.map(c => (
-                    <option key={c.name} value={c.name}>
-                      [{c.rarity}] {c.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500 text-xs">▼</div>
-              </div>
+              <NeoSelect
+                value={displayCharName}
+                onValueChange={handleCharPresetChange}
+                buttonClassName="text-sm"
+                options={[
+                  { value: 'custom', label: '⚙️ 自定义代理人数据' },
+                  ...CHARACTER_PRESETS.map(c => ({ value: c.name, label: `[${c.rarity}] ${c.name}` })),
+                ]}
+                ariaLabel="代理人白值"
+              />
             </div>
 
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
                 <span className="mb-2">⚔️ 音擎白值</span>
               </label>
-              <div className="relative">
-                <select
-                  value={displayWEngineName}
-                  onChange={(e) => handleWEnginePresetChange(e.target.value)}
-                  className="w-full nm-raised rounded-lg px-3.5 py-2.5 text-sm text-zinc-700 focus:outline-none focus:ring-1 focus:ring-zzz-orange/25 cursor-pointer appearance-none"
-                >
-                  <option value="custom">⚙️ 自定义武器数据</option>
-                  {WENGINE_PRESETS.map(w => (
-                    <option key={w.name} value={w.name}>
-                      [{w.rarity}] {w.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500 text-xs">▼</div>
-              </div>
+              <NeoSelect
+                value={displayWEngineName}
+                onValueChange={handleWEnginePresetChange}
+                buttonClassName="text-sm"
+                options={[
+                  { value: 'custom', label: '⚙️ 自定义武器数据' },
+                  ...WENGINE_PRESETS.map(w => ({ value: w.name, label: `[${w.rarity}] ${w.name}` })),
+                ]}
+                ariaLabel="音擎白值"
+              />
             </div>
           </div>
 
@@ -293,7 +284,6 @@ export const Calculator: React.FC<CalculatorProps> = ({
     </div>
   );
 };
-
 
 
 

@@ -3,6 +3,7 @@ import { CharacterProfile, CharacterType, DEFAULT_STATS } from '../types';
 import { storage } from '../services/storage';
 import { Save, Trash2, FolderOpen, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { NeoSelect } from './NeoSelect';
 
 interface ProfileManagerProps {
   onSelect: (profile: CharacterProfile) => void;
@@ -93,18 +94,17 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">角色类型</label>
-          <div className="relative">
-            <select
-              value={currentProfile.type}
-              onChange={(e) => onUpdate({ ...currentProfile, type: e.target.value as CharacterType })}
-              className="w-full nm-sunken rounded-lg px-3.5 py-2.5 text-sm text-zinc-700 focus:outline-none focus:border-zzz-orange/40 focus:ring-1 focus:ring-zzz-orange/25 transition-all duration-300 cursor-pointer appearance-none"
-            >
-              <option value="ATTACK">强攻</option>
-              <option value="ANOMALY">异常</option>
-              <option value="STUN">命破</option>
-            </select>
-            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500 text-xs">▼</div>
-          </div>
+          <NeoSelect
+            value={currentProfile.type}
+            onValueChange={(type) => onUpdate({ ...currentProfile, type: type as CharacterType })}
+            buttonClassName="text-sm"
+            options={[
+              { value: 'ATTACK', label: '强攻' },
+              { value: 'ANOMALY', label: '异常' },
+              { value: 'STUN', label: '命破' },
+            ]}
+            ariaLabel="角色类型"
+          />
         </div>
       </div>
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNeumorphicPressScale } from './hooks/useNeumorphicPressScale';
 import { CharacterProfile, CharacterStats, DEFAULT_STATS } from './types';
 import config from '../config.json';
 import { ProfileManager } from './components/ProfileManager';
@@ -15,6 +16,7 @@ import { storage } from './services/storage';
 type Tab = 'CALC' | 'CURVE' | 'DRIVE' | 'FORMULA' | 'DOCS' | 'ME';
 
 export default function App() {
+  useNeumorphicPressScale();
   const [activeTab, setActiveTab] = useState<Tab>('CALC');
   const [currentProfile, setCurrentProfile] = useState<CharacterProfile>(() => {
     // Try to load initial profile from storage
