@@ -69,8 +69,8 @@ export const MarginalBenefitChart: React.FC<MarginalBenefitChartProps> = ({ stat
         </p>
       </div>
       
-      <div className="w-full h-[600px]">
-        <ResponsiveContainer className="nm-raised rounded-xl pt-12 pb-5 pl-10 pr-10">
+      <div className="w-full h-[650px]">
+        <ResponsiveContainer className="nm-raised rounded-xl pt-20 pb-5 pl-10 pr-10">
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="#8a3e01" vertical={false} opacity={0.8} />
             <XAxis 
@@ -87,7 +87,7 @@ export const MarginalBenefitChart: React.FC<MarginalBenefitChartProps> = ({ stat
               fontSize={12} 
               tickLine={false} 
               axisLine={false}
-              dx={-10}
+              dx={-5}
               tickFormatter={(value) => `${value}%`}
               label={{ value: '边际收益 (%)', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#64748b', fontWeight: 600 }}
             />
@@ -96,7 +96,7 @@ export const MarginalBenefitChart: React.FC<MarginalBenefitChartProps> = ({ stat
               verticalAlign="bottom" 
               align="center" 
               iconType="circle" 
-              wrapperStyle={{ top: '15px' }}
+              wrapperStyle={{ top: '-40px' }}
               formatter={(value) => <span className="text-zinc-600 text-xs font-semibold">{STAT_LABELS[value as keyof CharacterStats].split(' (')[0]}</span>}
             />
             {relevantStats.map((stat, index) => (

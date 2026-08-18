@@ -380,7 +380,7 @@ export function DriveManager() {
               )}
             </div>
             <span className="min-w-0 text-xs font-black text-zinc-800 line-clamp-2">{preset.name}</span>
-            {isActive && <span className="absolute inset-y-2 left-0 w-1 rounded-r" style={{ backgroundColor: preset.color }} />}
+            {isActive && <span className="absolute inset-y-3 left-0 w-1 rounded-r" style={{ backgroundColor: preset.color }} />}
           </button>
         );
       })}
@@ -412,15 +412,65 @@ export function DriveManager() {
   );
 
   const renderSlotAndLevel = (editor: DiscEditorProps) => (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end px-1 py-3"><div className="md:col-span-5"><label className="block text-[10px] font-black text-zinc-400 mb-1.5">槽位</label><div className="grid grid-cols-6 gap-1">{[1, 2, 3, 4, 5, 6].map(num => <button key={num} type="button" onClick={() => editor.setSlot(num)} className={`py-1.5 rounded-lg text-xs font-black font-mono transition-all ${editor.slot === num ? 'text-white bg-zzz-orange' : 'text-zinc-500 hover:bg-zinc-200'}`}>{num}</button>)}</div></div><div className="md:col-span-7"><div className="flex justify-between items-center mb-1.5"><label className="text-[10px] font-black text-zinc-400">等级</label><span className="text-xs font-black font-mono text-zzz-orange bg-zzz-orange/10 px-2 py-0.5 rounded-md">+ {editor.level}</span></div><div className="h-[26px] flex items-center mt-2"><input type="range" min="0" max="15" step="1" value={editor.level} onChange={(e) => editor.setLevel(parseInt(e.target.value))} className="w-full h-1 bg-zinc-300 rounded-lg appearance-none cursor-pointer accent-zzz-orange" /></div></div></div>
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end px-1 py-3">
+      <div className="md:col-span-6">
+        <label className="block text-[10px] font-black text-zinc-400 mb-1.5">槽位</label>
+        <div className="grid grid-cols-6 gap-1">{[1, 2, 3, 4, 5, 6].map(num => <button key={num} type="button" onClick={() => editor.setSlot(num)} className={`py-1.5 rounded-lg text-xs font-black font-mono transition-all ${editor.slot === num ? 'text-white bg-zzz-orange' : 'text-zinc-500 hover:bg-zinc-200'}`}>{num}</button>)}
+        </div>
+      </div>
+      <div className="md:col-span-6">
+        <div className="flex justify-between items-center mb-1.5">
+          <label className="text-[10px] font-black text-zinc-400">等级</label>
+          <span className="text-xs font-black font-mono text-zzz-orange bg-zzz-orange/10 px-2 py-0.5 rounded-md">+ {editor.level}</span>
+        </div>
+        <div className="h-[26px] flex items-center mt-2">
+          <input type="range" min="0" max="15" step="1" value={editor.level} onChange={(e) => editor.setLevel(parseInt(e.target.value))} className="w-full h-1 bg-zinc-300 rounded-lg appearance-none cursor-pointer accent-zzz-orange" />
+        </div>
+      </div>
+    </div>
   );
 
   const renderMainStat = (editor: DiscEditorProps) => (
-    <div className="p-4 nm-sunken rounded-xl"><span className="block text-xs font-black text-zinc-500 mb-2">主词条</span><div className="grid grid-cols-1 gap-2"><NeoSelect value={editor.mainStatName} onValueChange={(name) => editor.setMainStatName(name as string)} buttonClassName="text-xs font-bold" options={getMainStatsForSlot(editor.slot).map(stat => ({ value: stat, label: stat }))} ariaLabel={`${editor.mode === 'edit' ? '编辑' : ''}主词条`} /><div className="mt-1 flex items-center justify-between text-zinc-700 p-3 rounded-lg text-xs nm-raised"><span className="font-bold text-zinc-400">{editor.mode === 'edit' ? '更改后的主属性:' : '主词条最终结果'}</span><span className="font-black font-mono text-zinc-800">+{editor.mainStatValue}{MAIN_STATS_CONFIG[editor.mainStatName]?.unit}</span></div></div></div>
+    <div className="p-4 nm-sunken rounded-xl"><span className="block text-xs font-black text-zinc-500 mb-2">主词条</span><div className="grid grid-cols-1 gap-2"><NeoSelect value={editor.mainStatName} onValueChange={(name) => editor.setMainStatName(name as string)} buttonClassName="text-xs font-bold" options={getMainStatsForSlot(editor.slot).map(stat => ({ value: stat, label: stat }))} ariaLabel={`${editor.mode === 'edit' ? '编辑' : ''}主词条`} /><div className="mt-1 flex items-center justify-between text-zinc-700 p-3 rounded-lg text-xs nm-raised"><span className="font-bold text-zinc-7s00">{editor.mode === 'edit' ? '更改后的主属性:' : '主词条最终结果'}</span><span className="font-black font-mono text-zinc-800">+{editor.mainStatValue}{MAIN_STATS_CONFIG[editor.mainStatName]?.unit}</span></div></div></div>
   );
 
   const renderSubStats = (editor: DiscEditorProps) => (
-    <div className="flex flex-col gap-3 nm-sunken rounded-xl p-4"><div className="flex justify-between items-center"><span className="block text-xs font-black text-zinc-500">副词条</span>{editor.subStats.length < 4 && <button type="button" onClick={editor.addSubStat} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black text-zzz-orange nm-raised-interactive"><Plus size={10} />新增副词条</button>}</div><div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">{editor.subStats.map((sub, idx) => { const unit = SUB_STATS_CONFIG[sub.name]?.unit || ''; const value = calculateSubStatValue(sub.name, sub.hits); return <div key={idx} className="p-3 nm-raised rounded-xl flex flex-col relative"><button type="button" onClick={() => editor.removeSubStat(idx)} className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[10px] font-black hover:text-red-500 transition-colors hover:bg-red-100" aria-label={`删除副词条 ${idx + 1}`} title="删除副词条"><X size={11} /></button><div className="flex items-center gap-2 pr-12"><span className="text-[10px] font-bold text-zinc-400 font-mono">#{idx + 1}</span><NeoSelect value={sub.name} onValueChange={(name) => editor.updateSubStat(idx, { name: name as string })} className="min-w-0 flex-1" buttonClassName="min-h-0 bg-transparent px-0 py-0 text-xs font-bold shadow-none hover:shadow-none" menuClassName="min-w-[10rem]" options={editor.availableSubStats(idx).map(opt => ({ value: opt, label: opt }))} ariaLabel={`副词条 ${idx + 1}`} /></div><div className="p-2 rounded-lg mt-1 flex flex-col gap-1.5"><div className="flex justify-between items-center text-[10px] font-mono"><span className="text-zinc-500 font-sans">强化: <strong className="text-zzz-orange font-black">+{sub.hits}</strong></span><span className="text-zinc-800 font-black text-xs">+{value}{unit}</span></div><input type="range" min="0" max="5" step="1" value={sub.hits} onChange={(e) => editor.updateSubStat(idx, { hits: parseInt(e.target.value) })} className="w-full h-1 bg-zinc-300 rounded-lg appearance-none cursor-pointer accent-zinc-700" /></div></div>; })}{editor.subStats.length === 0 && <div className="col-span-2 text-center py-5 text-xs text-zinc-400">未添加副词条。请点击右上角进行添加。</div>}</div></div>
+    <div className="flex flex-col gap-3 nm-sunken rounded-xl p-4">
+      <div className="flex justify-between items-center">
+        <span className="block text-xs font-black text-zinc-500">副词条</span>
+        {editor.subStats.length < 4 && 
+          <button type="button" onClick={editor.addSubStat} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black text-zzz-orange nm-raised-interactive">
+            <Plus size={10} />新增副词条
+          </button>
+        }
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        {
+          editor.subStats.map((sub, idx) => { 
+            const unit = SUB_STATS_CONFIG[sub.name]?.unit || ''; 
+            const value = calculateSubStatValue(sub.name, sub.hits); 
+            return <div key={idx} className="p-3 nm-raised rounded-xl flex flex-col relative">
+              <div className="flex items-center gap-2">
+                <NeoSelect value={sub.name} onValueChange={(name) => editor.updateSubStat(idx, { name: name as string })} className="min-w-0 flex-1" buttonClassName="min-h-0 bg-transparent text-xs font-bold shadow-none hover:shadow-none" menuClassName="min-w-[10rem]" options={editor.availableSubStats(idx).map(opt => ({ value: opt, label: opt }))} ariaLabel={`副词条 ${idx + 1}`} />
+                <button type="button" onClick={() => editor.removeSubStat(idx)} className="nm-del-raised-interactive hover:text-red-500 hover:bg-red-100" aria-label={`删除副词条 ${idx + 1}`} title="删除副词条">
+                  <X size={13} />
+                </button>
+              </div>
+              <div className="p-2 rounded-lg mt-1 flex flex-col gap-1.5">
+                <div className="flex justify-between items-center text-[10px] font-mono">
+                  <span className="text-zinc-500 font-sans">
+                    强化: 
+                    <strong className="text-zzz-orange font-black">+{sub.hits}</strong>
+                  </span>
+                  <span className="text-zinc-800 font-black text-xs">+{value}{unit}</span>
+                </div>
+                <input type="range" min="0" max="5" step="1" value={sub.hits} onChange={(e) => editor.updateSubStat(idx, { hits: parseInt(e.target.value) })} className="w-full h-1 bg-zinc-300 rounded-lg appearance-none cursor-pointer accent-zinc-700" />
+              </div>
+            </div>; 
+          })
+        }{editor.subStats.length === 0 && <div className="col-span-2 text-center py-5 text-xs text-zinc-400">未添加副词条。请点击右上角进行添加。</div>}
+      </div>
+    </div>
   );
 
   const addEditor: DiscEditorProps = { mode: 'add', setName: formSetName, preset: currentPreset, isEffectOpen: isFormSetEffectOpen, setEffectOpen: setIsFormSetEffectOpen, slot: formSlot, setSlot: setFormSlot, level: formLevel, setLevel: setFormLevel, mainStatName: formMainStatName, setMainStatName: setFormMainStatName, mainStatValue: computedMainValue, subStats: formSubStats, addSubStat: handleAddSubStat, removeSubStat: handleRemoveSubStat, updateSubStat: handleSubStatChange, availableSubStats: getAvailableSubStats };
@@ -459,12 +509,6 @@ export function DriveManager() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-5 flex flex-col gap-4 nm-raised rounded-xl p-5">
-            <div className="flex items-center justify-between pb-2.5">
-              <span className="text-xs font-black text-zinc-600 tracking-wider flex items-center gap-1.5 uppercase">
-                选择套装
-              </span>
-            </div>
-
             {renderSetSelection(addEditor)}
           </div>
 
@@ -475,143 +519,12 @@ export function DriveManager() {
             {/* Inputs & settings */}
             <form onSubmit={handleAddSubmit} className="flex flex-col gap-4">
               {renderSlotAndLevel(addEditor)}
-              {false && 
-              <div>
-                {/* Slot Selector */}
-                <div className="md:col-span-5">
-                  <label className="block text-[10px] font-black text-zinc-400 mb-1.5">槽位</label>
-                  <div className="grid grid-cols-6 gap-1">
-                    {[1, 2, 3, 4, 5, 6].map(num => (
-                      <button
-                        key={num}
-                        type="button"
-                        onClick={() => setFormSlot(num)}
-                        className={`py-1.5 rounded-lg text-xs font-black font-mono transition-all duration-200 ${
-                          formSlot === num 
-                            ? 'text-white bg-zzz-orange'
-                            : 'text-zinc-500 hover:bg-zinc-200'
-                        }`}
-                      >
-                        {num}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Level slider */}
-                <div className="md:col-span-7">
-                  <div className="flex justify-between items-center mb-1.5">
-                    <label className="text-[10px] font-black text-zinc-400">等级</label>
-                    <span className="text-xs font-black font-mono text-zzz-orange bg-zzz-orange/10 px-2 py-0.5 rounded-md">
-                      + {formLevel}
-                    </span>
-                  </div>
-                  <div className="h-[26px] flex items-center gap-3 mt-2">
-                    <input
-                      type="range"
-                      min="0"
-                      max="15"
-                      step="1"
-                      value={formLevel}
-                      onChange={(e) => setFormLevel(parseInt(e.target.value))}
-                      className="w-full h-1 bg-zinc-300 rounded-lg appearance-none cursor-pointer accent-zzz-orange"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 nm-sunken rounded-xl hidden">
-                <span className="block text-xs font-black text-zinc-500 mb-2">主词条</span>
-                <div className="grid grid-cols-1 gap-2">
-                  <NeoSelect
-                    value={formMainStatName}
-                    onValueChange={(name) => setFormMainStatName(name as string)}
-                    buttonClassName="text-xs font-bold"
-                    options={getMainStatsForSlot(formSlot).map(stat => ({ value: stat, label: stat }))}
-                    ariaLabel="主词条"
-                  />
-                  <div className="mt-1 flex items-center justify-between text-zinc-700 p-3 rounded-lg text-xs nm-raised">
-                    <span className="font-bold text-zinc-400">主词条最终结果</span>
-                    <span className="font-black font-mono text-zinc-800">+{computedMainValue}{MAIN_STATS_CONFIG[formMainStatName]?.unit}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3 nm-sunken rounded-xl hidden">
-                <div className="flex justify-between items-center">
-                  <span className="block text-xs font-black text-zinc-500">
-                    副词条
-                  </span>
-                  {formSubStats.length < 4 && (
-                    <button
-                      type="button"
-                      onClick={handleAddSubStat}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black text-zzz-orange nm-raised-interactive"
-                    >
-                      <Plus size={10} /> 新增副词条
-                    </button>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {formSubStats.map((sub, idx) => {
-                    const formatUnit = SUB_STATS_CONFIG[sub.name]?.unit || '';
-                    const totalRolls = sub.hits + 1;
-                    const statValue = calculateSubStatValue(sub.name, sub.hits);
-
-                    return (
-                      <div key={idx} className="p-3 nm-raised rounded-xl flex flex-col relative">
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveSubStat(idx)}
-                          className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[10px] font-black hover:text-red-500 transition-colors hover:bg-red-100"
-                          aria-label={`删除副词条 ${idx + 1}`}
-                        >
-                          <X size={11} />
-                        </button>
-
-                        <div className="flex items-center gap-2 pr-12"><span className="text-[10px] font-bold text-zinc-400 font-mono">#{idx+1}</span>
-                          <NeoSelect
-                            value={sub.name}
-                            onValueChange={(name) => handleSubStatChange(idx, { name })}
-                            className="min-w-0 flex-1"
-                            buttonClassName="min-h-0 bg-transparent px-0 py-0 text-xs font-bold shadow-none hover:shadow-none"
-                            menuClassName="min-w-[10rem]"
-                            options={getAvailableSubStats(idx).map(opt => ({ value: opt, label: opt }))}
-                            ariaLabel={`副词条 ${idx + 1}`}
-                          />
-                        </div>
-                        <div className="p-2 rounded-lg mt-1 flex flex-col gap-1.5">
-                          <div className="flex justify-between items-center text-[10px] font-mono"><span className="text-zinc-500 font-sans">强化: <strong className="text-zzz-orange font-black">+{sub.hits}</strong></span><span className="text-zinc-800 font-black text-xs">+{statValue}{formatUnit}</span></div>
-                          <input
-                            type="range"
-                            min="0"
-                            max="5"
-                            step="1"
-                            value={sub.hits}
-                            onChange={(e) => handleSubStatChange(idx, { hits: parseInt(e.target.value) })}
-                            className="w-full h-1 bg-zinc-300 rounded-lg appearance-none cursor-pointer accent-zinc-700"
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  {formSubStats.length === 0 && (
-                    <div className="col-span-2 text-center py-5 text-xs text-zinc-400">
-                      未添加副词条。请点击右上角进行添加。
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              </>}
               {renderMainStat(addEditor)}
               {renderSubStats(addEditor)}
               {/* Submit button */}
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl text-xs font-black text-white bg-zzz-orange nm-orange-raised-interactive flex items-center justify-center gap-2 shadow-md hover:brightness-105 mt-2"
+                className="w-full py-3 rounded-xl text-xs nm-orange-raised-interactive flex items-center justify-center gap-2 shadow-md hover:brightness-105 mt-2"
               >
                 <Plus size={14} />
                 确认配置并保存
@@ -916,73 +829,7 @@ export function DriveManager() {
                     <div className="mt-1 flex items-center justify-between text-zinc-700 p-3 rounded-lg text-xs nm-raised"><span className="font-bold text-zinc-400">更改后的主属性:</span><span className="font-black font-mono text-zinc-800">+{computedEditMainValue}{MAIN_STATS_CONFIG[editMainStatName]?.unit}</span></div>
                   </div>
                 </div>
-
-                <div className="flex flex-col gap-3 nm-sunken p-4 rounded-xl">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-black text-zinc-500 uppercase flex items-center gap-1">
-                      副词条
-                    </span>
-                    {editSubStats.length < 4 && (
-                      <button
-                        type="button"
-                        onClick={handleAddEditSubStat}
-                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black text-zzz-orange nm-raised-interactive"
-                      >
-                        <Plus size={10} />增加副词条
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {editSubStats.map((sub, idx) => {
-                      const formatUnit = SUB_STATS_CONFIG[sub.name]?.unit || '';
-                      const totalRolls = sub.hits + 1;
-                      const statValue = calculateSubStatValue(sub.name, sub.hits);
-
-                      return (
-                        <div key={idx} className="p-3 nm-raised rounded-xl bg-[#f0f3f6] flex flex-col gap-2 relative">
-                          <button
-                          type="button"
-                          onClick={() => handleRemoveSubStat(idx)}
-                          className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[10px] font-black hover:text-red-500 transition-colors hover:bg-red-100"
-                          aria-label={`删除副词条 ${idx + 1}`}
-                        >
-                          <X size={11} />
-                        </button>
-
-                          <div className="flex items-center gap-2 pr-4"><span className="text-[10px] font-bold text-zinc-400 font-mono">#{idx+1}</span>
-                            <NeoSelect
-                              value={sub.name}
-                              onValueChange={(name) => handleEditSubStatChange(idx, { name })}
-                              className="min-w-0 flex-1"
-                              buttonClassName="min-h-0 bg-transparent px-0 py-0 text-xs font-bold shadow-none hover:shadow-none"
-                              menuClassName="min-w-[10rem]"
-                              options={getAvailableEditSubStats(idx).map(opt => ({ value: opt, label: opt }))}
-                              ariaLabel={`编辑副词条 ${idx + 1}`}
-                            />
-                          </div>
-                          <div className="p-2 rounded-lg flex flex-col gap-1.5"><div className="flex justify-between items-center text-[10px] font-mono"><span className="text-zinc-500 font-sans">强化: <strong className="text-zzz-orange font-black">+{sub.hits}</strong> ({totalRolls}跳)</span><span className="text-zinc-800 font-black text-xs">+{statValue}{formatUnit}</span></div>
-                            <input
-                              type="range"
-                              min="0"
-                              max="5"
-                              step="1"
-                              value={sub.hits}
-                              onChange={(e) => handleEditSubStatChange(idx, { hits: parseInt(e.target.value) })}
-                              className="w-full h-1 bg-zinc-300 rounded-lg appearance-none cursor-pointer accent-zinc-700"
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                    {editSubStats.length === 0 && (
-                      <div className="col-span-2 text-center py-5 bg-zinc-100/50 text-xs text-zinc-400">
-                        该盘片无副属性词条，请在右上角添加副属性。
-                      </div>
-                    )}
-                  </div>
-                </div>
+                {renderSubStats(addEditor)}
 
                 {/* Confirm operations footers */}
                 <div className="flex gap-3 border-t border-zinc-200/50">
