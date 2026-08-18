@@ -60,7 +60,7 @@ body {
   box-shadow: 6px 6px 12px #d1d9e6, -6px -6px 12px #ffffff;
   transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
 }
 
@@ -110,7 +110,7 @@ body {
     inset 1px 1px 2px #ffaa4d, inset -1px -1px 2px #d46f0e;
   transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
 }
 
@@ -168,12 +168,14 @@ body {
   box-shadow: 4px 4px 9px #d1d9e6, -4px -4px 9px #ffffff;
   cursor: pointer;
   text-align: left;
-  transition: box-shadow 180ms ease, color 180ms ease, transform 180ms ease;
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .neo-select__trigger:hover,
 .neo-select__trigger[aria-expanded='true'] {
-  box-shadow: inset 2px 2px 5px #d1d9e6, inset -2px -2px 5px #ffffff;
+  box-shadow: 1px 1px 2px #d1d9e6, -1px -1px 2px #ffffff;
   color: #27272a;
 }
 
@@ -212,7 +214,6 @@ body {
   padding: 0.55rem 0.7rem;
   border: 0;
   border-radius: 0.6rem;
-  color: #52525b;
   background: transparent;
   cursor: pointer;
   font-size: inherit;
@@ -221,8 +222,13 @@ body {
   transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
 }
 
-.neo-select__option:hover { background: rgba(255, 255, 255, 0.62); color: #27272a; }
-.neo-select__option--selected { color: #c96008; background: #e7ebf0; box-shadow: inset 2px 2px 4px #d1d9e6, inset -2px -2px 4px #ffffff; }
+.neo-select__option:hover { background: #efddd0; color: #27272a; }
+.neo-select__option--selected { 
+  color: #f37f0f; 
+  background-color: #edf0f4;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
+}
 .neo-select__option:disabled { opacity: 0.45; cursor: not-allowed; }
 
 @keyframes neo-select-enter { from { opacity: 0; transform: translateY(-4px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }

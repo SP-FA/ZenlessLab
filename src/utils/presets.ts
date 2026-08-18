@@ -151,6 +151,11 @@ export interface DriveDiscPreset {
   twoPieceEffect: string;
   fourPieceEffect: string;
   color: string;
+  /**
+   * 套装缩略图。将图片放入 `src/assets/drive-discs/` 后，在这里填入对应 import。
+   * 未配置时，界面会显示带套装色的图片占位符。
+   */
+  image?: string;
 }
 
 export const DRIVE_DISC_PRESETS: DriveDiscPreset[] = [

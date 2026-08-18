@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
 const INTERACTIVE_SELECTOR = '.nm-raised-interactive, .nm-orange-raised-interactive, .nm-raised-active';
-const HOVER_SHRINK_PX = 0;
-const PRESS_SHRINK_PX = 1;
+const HOVER_SHRINK_PX = 1;
+const PRESS_SHRINK_PX = 2;
 
 function setScaleVariables(element: HTMLElement) {
   const width = element.offsetWidth;
