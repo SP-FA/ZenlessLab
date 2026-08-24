@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Disc, Plus, Trash2, Edit2, X, Sparkles, FolderOpen, 
-  HelpCircle, Check, Filter, Undo2, ChevronRight, Info
+import {
+  Disc, Plus, Trash2, Edit2, X, FolderOpen,
+  Filter, ChevronRight
 } from 'lucide-react';
 import { DriveDisc, DriveDiscSubStat } from '../types';
 import { storage } from '../services/storage';
@@ -79,10 +79,7 @@ export function DriveManager() {
   const [formSlot, setFormSlot] = useState<number>(1);
   const [formLevel, setFormLevel] = useState<number>(15);
   const [formMainStatName, setFormMainStatName] = useState<string>('固定生命值');
-  const [formSubStats, setFormSubStats] = useState<Omit<DriveDiscSubStat, 'value'>[]>([
-    { name: '攻击力 (%)', hits: 0 },
-    { name: '暴击率 (%)', hits: 0 },
-  ]);
+  const [formSubStats, setFormSubStats] = useState<Omit<DriveDiscSubStat, 'value'>[]>([]);
   const [isFormSetEffectOpen, setIsFormSetEffectOpen] = useState(false);
 
   // Edit Panel / Popup state (For separate edit logic)
@@ -93,6 +90,16 @@ export function DriveManager() {
   const [editMainStatName, setEditMainStatName] = useState<string>('固定生命值');
   const [editSubStats, setEditSubStats] = useState<Omit<DriveDiscSubStat, 'value'>[]>([]);
   const [isEditSetEffectOpen, setIsEditSetEffectOpen] = useState(false);
+
+  // Lookup table mapping preset name -> its order in DRIVE_DISC_PRESETS.
+  // Unknown sets (legacy data) fall to the end.
+  const presetOrderMap = useMemo(() => {
+    const map = new Map<string, number>();
+    DRIVE_DISC_PRESETS.forEach((preset, index) => {
+      map.set(preset.name, index);
+    });
+    return map;
+  }, []);
 
   // Loading discs on mount
   useEffect(() => {
@@ -207,7 +214,7 @@ export function DriveManager() {
   };
 
   // Submit adding a new drive disc
-  const handleAddSubmit = (e: React.FormEvent) => {
+  const handleAddSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const finalSubStats: DriveDiscSubStat[] = formSubStats.map(sub => ({
@@ -233,14 +240,11 @@ export function DriveManager() {
     setFormSlot(1);
     setFormLevel(15);
     setFormMainStatName('固定生命值');
-    setFormSubStats([
-      { name: '攻击力 (%)', hits: 0 },
-      { name: '暴击率 (%)', hits: 0 },
-    ]);
+    setFormSubStats([]);
   };
 
   // Submit editing an existing drive disc (Popout modal completion)
-  const handleEditSubmit = (e: React.FormEvent) => {
+  const handleEditSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!editingId) return;
 
@@ -299,12 +303,22 @@ export function DriveManager() {
         return matchesSlot && matchesSet;
       })
       .sort((a, b) => {
-        if (a.setName !== b.setName) {
-          return a.setName.localeCompare(b.setName);
+        // Primary: drive-disc type order as defined in DRIVE_DISC_PRESETS
+        const orderA = presetOrderMap.get(a.setName) ?? 999;
+        const orderB = presetOrderMap.get(b.setName) ?? 999;
+        if (orderA !== orderB) {
+          return orderA - orderB;
         }
-        return a.slot - b.slot;
+        // Secondary: slot 1 → 6
+        if (a.slot !== b.slot) {
+          return a.slot - b.slot;
+        }
+        // Tertiary: newest first within the same type + slot
+        const timeA = a.updated_at || '';
+        const timeB = b.updated_at || '';
+        return timeB.localeCompare(timeA);
       });
-  }, [warehouse, slotFilter, setFilter]);
+  }, [warehouse, slotFilter, setFilter, presetOrderMap]);
 
   // Unique lists for filtering dropdowns
   const availableFilterSets = useMemo(() => {
@@ -312,55 +326,13 @@ export function DriveManager() {
     return list.sort((a, b) => a.localeCompare(b));
   }, [warehouse]);
 
-  // Quick helper to render the custom futuristic vinyl record graphic
-  const renderRecordGraphic = (setName: string, slot: number, size: number = 84) => {
-    const preset = DRIVE_DISC_PRESETS.find(p => p.name === setName) || { color: '#888888' };
-    const romanNumerals = ["I", "II", "III", "IV", "V", "VI"];
-    const slotLabel = romanNumerals[slot - 1] || slot.toString();
-
-    return (
-      <div className="relative flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
-        {/* Soft shadow background element */}
-        <div className="absolute inset-0.5 rounded-full bg-zinc-200 nm-sunken" />
-        
-        {/* Rotating Outer CD Rings */}
-        <svg viewBox="0 0 100 100" className="w-full h-full relative z-10 transition-transform duration-1000 hover:rotate-180">
-          <circle cx="50" cy="50" r="45" fill="#18181b" stroke="#374151" strokeWidth="1" />
-          <circle cx="50" cy="50" r="40" fill="none" stroke="#27272a" strokeWidth="1.5" strokeDasharray="3 3" />
-          <circle cx="50" cy="50" r="35" fill="none" stroke="#3f3f46" strokeWidth="0.75" />
-          <circle cx="50" cy="50" r="28" fill="none" stroke="#27272a" strokeWidth="1.25" strokeDasharray="10 2" />
-          <circle cx="50" cy="50" r="18" fill={preset.color} className="opacity-80 animate-pulse" />
-          <circle cx="50" cy="50" r="14" fill="#09090b" />
-          <circle cx="50" cy="50" r="4" fill="none" stroke="#52525b" strokeWidth="1" />
-          <text 
-            x="50" 
-            y="54" 
-            textAnchor="middle" 
-            fill="#ffffff" 
-            fontSize="11" 
-            fontWeight="900" 
-            fontFamily="monospace"
-          >
-            {slotLabel}
-          </text>
-        </svg>
-        
-        {/* Ambient Glow background */}
-        <div 
-          className="absolute inset-4 rounded-full filter blur-md opacity-40 transition-opacity duration-300 pointer-events-none"
-          style={{ backgroundColor: preset.color }}
-        />
-      </div>
-    );
-  };
-
   /** Shared picker UI only; creation and editing remain two separate workflows. */
   const renderSetPicker = (
     selectedName: string,
     onSelect: (preset: DriveDiscPreset) => void,
     compact = false,
   ) => (
-    <div className={`grid grid-cols-2 gap-2 overflow-y-auto select-none custom-scrollbar ${compact ? 'max-h-[260px] p-2' : 'max-h-[590px] p-3.5 nm-sunken rounded-xl'}`}>
+    <div className={`grid grid-cols-2 gap-2 overflow-y-auto select-none custom-scrollbar ${compact ? 'max-h-[520px] p-3.5 nm-sunken rounded-xl' : 'max-h-[460px] p-3.5 nm-sunken rounded-xl'}`}>
       {DRIVE_DISC_PRESETS.map((preset) => {
         const isActive = selectedName === preset.name;
         return (
@@ -406,8 +378,25 @@ export function DriveManager() {
 
   const renderSetEffect = (editor: DiscEditorProps) => (
     <>
-      <div className="flex items-center justify-between"><span className="text-xs font-black text-zinc-600 uppercase">驱动盘属性</span><button type="button" onClick={() => editor.setEffectOpen(!editor.isEffectOpen)} className="flex items-center gap-1.5 text-[10px] font-black text-zinc-500 hover:text-zinc-800">套装效果 <ChevronRight size={12} className={`transition-transform ${editor.isEffectOpen ? 'rotate-90' : ''}`} /></button></div>
-      {editor.isEffectOpen && <div className="rounded-lg border border-zinc-300 px-3 py-2.5 text-[11px] leading-relaxed text-zinc-600"><p><strong className="text-zinc-700">2件套：</strong>{editor.preset.twoPieceEffect}</p><p><strong className="text-zinc-700">4件套：</strong>{editor.preset.fourPieceEffect}</p></div>}
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-black text-zinc-600 uppercase">驱动盘属性</span>
+        <button type="button" onClick={() => editor.setEffectOpen(!editor.isEffectOpen)} className="flex items-center gap-1.5 text-[10px] font-black text-zinc-500 hover:text-zinc-800">
+          套装效果 
+          <ChevronRight size={12} className={`transition-transform ${editor.isEffectOpen ? 'rotate-90' : ''}`} />
+        </button>
+      </div>
+      {editor.isEffectOpen && 
+        <div className="rounded-lg border border-zinc-300 px-3 py-2.5 text-[11px] leading-relaxed text-zinc-600">
+          <p>
+            <strong className="text-zinc-700">2件套：</strong>
+            {editor.preset.twoPieceEffect}
+          </p>
+          <p>
+            <strong className="text-zinc-700">4件套：</strong>
+            {editor.preset.fourPieceEffect}
+          </p>
+        </div>
+      }
     </>
   );
 
@@ -590,7 +579,7 @@ export function DriveManager() {
         <div className="grid grid-cols-1 sm:grid-cols-5 xl:grid-cols-5 gap-6">
           <AnimatePresence mode="popLayout">
             {sortedAndFilteredDiscs.map((disc) => {
-              const preset = DRIVE_DISC_PRESETS.find(p => p.name === disc.setName) || { color: '#888888' };
+              const preset = DRIVE_DISC_PRESETS.find(p => p.name === disc.setName) || { color: '#888888', image: undefined };
               const isMainPct = MAIN_STATS_CONFIG[disc.mainStatName]?.unit === '%';
 
               return (
@@ -610,7 +599,16 @@ export function DriveManager() {
 
                   {/* Top Block: Title, Slot representation */}
                   <div className="flex gap-4 items-center">
-                    {renderRecordGraphic(disc.setName, disc.slot, 60)}
+                    {/* Preset image display */}
+                    <div className="relative shrink-0" style={{ width: 60, height: 60 }}>
+                      <div className="h-full w-full overflow-hidden rounded-full bg-zinc-200" style={{ boxShadow: `inset 0 0 0 2px ${preset.color}` }}>
+                        {preset.image ? (
+                          <img src={preset.image} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-[8px] font-black text-zinc-400">图片</div>
+                        )}
+                      </div>
+                    </div>
                     <div className="flex-1 min-w-0">
                       <span className="text-xs font-black text-zinc-800 line-clamp-1">
                         {disc.setName}
@@ -628,8 +626,7 @@ export function DriveManager() {
 
                   {/* Main stats displays */}
                   <div className="flex flex-col gap-2 flex-1">
-                    <div className="flex justify-between items-center px-3 py-2 rounded-lg nm-raised text-xs">
-                      <span className="font-bold text-zinc-400">主词条:</span>
+                    <div className="flex justify-center items-center py-2 rounded-lg nm-raised text-xs">
                       <span className="font-black font-mono text-zinc-800">
                         {disc.mainStatName} +{disc.mainStatValue}{isMainPct ? '%' : ''}
                       </span>
@@ -637,8 +634,7 @@ export function DriveManager() {
 
                     {/* Sub stats displaying */}
                     <div className="space-y-1.5 mt-1">
-                      <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest block">副词条:</span>
-                      <div className="grid grid-cols-1 gap-1.5">
+                      <div className="grid grid-cols-1 gap-1.5 pt-2">
                         {disc.subStats.map((sub, sIdx) => {
                           const subUnit = SUB_STATS_CONFIG[sub.name]?.unit || '';
                           return (
@@ -711,7 +707,6 @@ export function DriveManager() {
             </div>
           )}
         </div>
-
       </div>
 
       <AnimatePresence>
@@ -752,105 +747,40 @@ export function DriveManager() {
                 </button>
               </div>
 
-              {/* Editing Form wrapper layout */}
-              <form onSubmit={handleEditSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <div className="lg:col-span-5 flex flex-col gap-3 nm-raised rounded-xl p-4">
-                  <span className="text-xs font-black text-zinc-600">修改套装</span>
-                  {renderSetPicker(editSetName, handleEditPresetSelect, true)}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div className="lg:col-span-5 flex flex-col gap-4 nm-raised rounded-xl p-5">
+                  {renderSetSelection(editEditor)}
                 </div>
 
-                <div className="lg:col-span-7 flex flex-col gap-4 nm-raised rounded-xl p-5">
+                {/* Compact property editor keeps the creation workflow distinct from editing. */}
+                <div className="lg:col-span-7 p-5 rounded-xl flex flex-col gap-4 nm-raised">
+                  {renderSetEffect(editEditor)}
 
-              <button type="button" onClick={() => setIsEditSetEffectOpen(!isEditSetEffectOpen)} className="flex items-center justify-between px-1 text-[10px] font-black text-zinc-500 hover:text-zinc-800">
-                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: currentEditPreset.color }} />{currentEditPreset.name} · 套装效果</span>
-                <ChevronRight size={12} className={`transition-transform ${isEditSetEffectOpen ? 'rotate-90' : ''}`} />
-              </button>
-              {isEditSetEffectOpen && (
-                <div className="px-3 py-2.5 rounded-lg bg-zinc-100/70 text-[11px] leading-relaxed text-zinc-600 space-y-1">
-                  <p><strong className="text-zinc-800">2件套：</strong>{currentEditPreset.twoPieceEffect}</p>
-                  <p><strong className="text-zinc-800">4件套：</strong>{currentEditPreset.fourPieceEffect}</p>
-                </div>
-              )}
-
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end px-1 py-3 border-y border-zinc-200/70">
-                  {/* Slot selector */}
-                  <div className="md:col-span-5">
-                    <label className="block text-[10px] font-black text-zinc-400 mb-1.5">槽位</label>
-                    <div className="grid grid-cols-6 gap-1">
-                      {[1, 2, 3, 4, 5, 6].map(num => (
-                        <button
-                          key={num}
-                          type="button"
-                          onClick={() => setEditSlot(num)}
-                          className={`py-1.5 rounded-lg text-xs font-black font-mono transition-all duration-200 ${
-                            editSlot === num 
-                              ? 'text-white bg-zinc-800 nm-raised-active'
-                            : 'text-zinc-500 bg-zinc-100 hover:bg-zinc-200'
-                          }`}
-                        >
-                          {num}
-                        </button>
-                      ))}
+                  {/* Inputs & settings */}
+                  <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
+                    {renderSlotAndLevel(editEditor)}
+                    {renderMainStat(editEditor)}
+                    {renderSubStats(editEditor)}
+                    {/* Submit button */}
+                    <div className="flex gap-3 border-t border-zinc-200/50">
+                      <button
+                        type="button"
+                        onClick={handleCancelEdit}
+                        className="flex-1 py-3 rounded-xl text-xs font-black text-zinc-600 nm-raised-interactive flex items-center justify-center gap-2"
+                      >
+                        取消修改
+                      </button>
+                      <button
+                        type="submit"
+                        className="flex-1 py-3 rounded-xl text-xs font-black text-white bg-zzz-orange nm-orange-raised-interactive flex items-center justify-center gap-2 shadow-md hover:brightness-105"
+                      >
+                        确认修改
+                      </button>
                     </div>
-                  </div>
 
-                  {/* Level selector */}
-                  <div className="md:col-span-7">
-                    <div className="flex justify-between items-center mb-1.5">
-                      <label className="text-[10px] font-black text-zinc-400 font-sans">等级</label>
-                      <span className="text-xs font-black font-mono text-zzz-orange bg-zzz-orange/10 px-2 py-0.5 rounded-md">
-                        + {editLevel}
-                      </span>
-                    </div>
-                    <div className="h-[26px] flex items-center gap-3 mt-2">
-                      <input
-                        type="range"
-                        min="0"
-                        max="15"
-                        step="1"
-                        value={editLevel}
-                        onChange={(e) => setEditLevel(parseInt(e.target.value))}
-                        className="w-full h-1 bg-zinc-300 rounded-lg appearance-none cursor-pointer accent-zzz-orange"
-                      />
-                    </div>
-                  </div>
+                  </form>
                 </div>
-
-                <div className="p-4 nm-sunken rounded-xl">
-                  <span className="block text-xs font-black text-zinc-500 mb-2">主词条</span>
-                  <div className="grid grid-cols-1 gap-2">
-                    <NeoSelect
-                      value={editMainStatName}
-                      onValueChange={(name) => setEditMainStatName(name as string)}
-                      buttonClassName="text-xs font-bold"
-                      options={getMainStatsForSlot(editSlot).map(stat => ({ value: stat, label: stat }))}
-                      ariaLabel="编辑主词条"
-                    />
-                    <div className="mt-1 flex items-center justify-between text-zinc-700 p-3 rounded-lg text-xs nm-raised"><span className="font-bold text-zinc-400">更改后的主属性:</span><span className="font-black font-mono text-zinc-800">+{computedEditMainValue}{MAIN_STATS_CONFIG[editMainStatName]?.unit}</span></div>
-                  </div>
-                </div>
-                {renderSubStats(addEditor)}
-
-                {/* Confirm operations footers */}
-                <div className="flex gap-3 border-t border-zinc-200/50">
-                  <button
-                    type="button"
-                    onClick={handleCancelEdit}
-                    className="flex-1 py-3 rounded-xl text-xs font-black text-zinc-600 nm-raised-interactive flex items-center justify-center gap-2"
-                  >
-                    取消修改
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 py-3 rounded-xl text-xs font-black text-white bg-zzz-orange nm-orange-raised-interactive flex items-center justify-center gap-2 shadow-md hover:brightness-105"
-                  >
-                    确认修改
-                  </button>
-                </div>
-
-                </div>
-
-              </form>
+              </div>
             </motion.div>
           </div>
         )}

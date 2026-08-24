@@ -120,7 +120,7 @@ export const FormulaView: React.FC = () => {
         <div className="mb-5 p-6 nm-sunken rounded-2xl flex flex-col gap-6">
           <h3 className="text-x font-bold text-zinc-800 block mb-1.5 flex items-center gap-1.5">
             <Compass size={17} className="text-zzz-orange" />
-            各输出职业最终期望公式
+            各职业最终期望公式
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 nm-raised rounded-xl">

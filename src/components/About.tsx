@@ -14,7 +14,7 @@ export const Me: React.FC = () => {
       <div className="w-full nm-raised p-8 rounded-3xl grid grid-cols-1 lg:grid-cols-18 gap-4 items-center">
         <div className="lg:col-span-5 flex flex-col items-center justify-center text-center p-6 nm-sunken rounded-2xl">
           <div className="relative mb-5 group">
-            <div className="nm-raised-big flex w-28 h-28 rounded-full justify-center items-center">
+            <div className="nm-raised flex w-28 h-28 rounded-full justify-center items-center">
                 <img 
                   src={avatarImg} 
                   alt="SPFA Avatar" 
@@ -32,7 +32,7 @@ export const Me: React.FC = () => {
           <p className="text-xs text-zinc-600 leading-relaxed text-left px-2">
             👋 Hi there, 我是 SPFA，感谢使用本工具，欢迎随时与我联系！
           </p>
-          <div className="flex flex-col justify-center gap-1 mt-4 w-full nm-raised rounded-xl p-3">
+          <div className="flex flex-col justify-center gap-1 mt-4 w-full border border-zinc-300 rounded-xl p-3">
             <span className="font-bold text-x">
             Contact with me
             </span>
@@ -53,7 +53,7 @@ export const Me: React.FC = () => {
               </a>
               <a 
                 href="mailto:2997839760@qq.com" 
-                className="inline-flex items-center gap-2 justify-center p-2 nm-raised text-xs font-bold rounded-lg text-zzz-orange hover:text-orange-400"
+                className="inline-flex items-center gap-2 justify-center p-2 nm-raised text-xs font-bold rounded-lg text-zzz-orange"
               >
                 <Mail size={14} className="text-zzz-orange" />
                 2997839760@qq.com
@@ -132,7 +132,23 @@ export const Me: React.FC = () => {
               </div>
               <div className="flex items-center gap-2.5">
                 <Circle className="text-zzz-orange/70 shrink-0" size={14} />
-                <span>对接绝区零官方API实现自动导入人物面板</span>
+                <span>保存代理人+配队+驱动盘快照</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <Circle className="text-zzz-orange/70 shrink-0" size={14} />
+                <span>加入风属性机制</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <Circle className="text-zzz-orange/70 shrink-0" size={14} />
+                <span>加入流明属性机制</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <Circle className="text-zzz-orange/70 shrink-0" size={14} />
+                <span>加入御锋职业</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <Circle className="text-zzz-orange/70 shrink-0" size={14} />
+                <span>加入黑夜模式</span>
               </div>
             </div>
           </div>
