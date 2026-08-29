@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNeumorphicPressScale } from './hooks/useNeumorphicPressScale';
 import { CharacterProfile, CharacterStats, DEFAULT_STATS } from './types';
-import config from '../config.json';
 import { ProfileManager } from './components/ProfileManager';
 import { Calculator } from './components/Calculator';
 import { FormulaView } from './components/FormulaView';
@@ -9,14 +8,28 @@ import { Docs } from './components/Docs';
 import { Me } from './components/About';
 import { MarginalBenefitChart } from './components/MarginalBenefitChart';
 import { DriveManager } from './components/DriveManager';
+import { Header, HeaderTab } from './components/Header';
 import { LayoutDashboard, Calculator as CalcIcon, BookOpen, FileCode, AtSign, Github, TrendingUp, Disc } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { storage } from './services/storage';
 
 type Tab = 'CALC' | 'CURVE' | 'DRIVE' | 'FORMULA' | 'DOCS' | 'ME';
 
+const tabs: HeaderTab[] = [
+  { id: 'CALC', label: '计算分析', icon: CalcIcon },
+  { id: 'CURVE', label: '收益曲线', icon: TrendingUp },
+  { id: 'DRIVE', label: '驱动盘', icon: Disc },
+  { id: 'FORMULA', label: '计算公式', icon: FileCode },
+  { id: 'DOCS', label: '指南文档', icon: BookOpen },
+  { id: 'ME', label: 'About', icon: AtSign },
+];
+
+const transition = { type: 'spring' as const, bounce: 0.1, duration: 0.4 };
+
 export default function App() {
   useNeumorphicPressScale();
+  const [subApp, setSubApp] = useState<'zenless' | 'modmanager'>('zenless');
+  const [direction, setDirection] = useState(1);
   const [activeTab, setActiveTab] = useState<Tab>('CALC');
   const [currentProfile, setCurrentProfile] = useState<CharacterProfile>(() => {
     // Try to load initial profile from storage
@@ -41,56 +54,26 @@ export default function App() {
     setCurrentProfile(profile);
   };
 
-  const menuItems = [
-    { id: 'CALC', label: '计算分析', icon: CalcIcon },
-    { id: 'CURVE', label: '收益曲线', icon: TrendingUp },
-    { id: 'DRIVE', label: '驱动盘', icon: Disc },
-    { id: 'FORMULA', label: '计算公式', icon: FileCode },
-    { id: 'DOCS', label: '指南文档', icon: BookOpen },
-    { id: 'ME', label: 'About', icon: AtSign },
-  ];
+  const handleSwitchSubApp = () => {
+    setDirection(subApp === 'zenless' ? 1 : -1);
+    setSubApp(subApp === 'zenless' ? 'modmanager' : 'zenless');
+  };
 
   return (
     <div className="min-h-screen bg-[#f0f3f6] text-zinc-800 font-sans selection:bg-zzz-orange/20">
-      <header className="header h-16 border-b border-zinc-200/50 flex items-center px-6 bg-[#f0f3f6]/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="left flex items-center gap-4">
-          <div className="w-10 h-10 nm-orange-raised-interactive rounded-xl flex items-center justify-center text-white font-black">
-            Z
-          </div>
-          <div>
-            <h1 className="mt-1.5 text-sm font-black tracking-tight text-zinc-800 leading-none">ZENLESS LAB</h1>
-            <p className="text-[10px] text-zinc-500 font-mono mt-1.5 uppercase tracking-widest">v{config.VERSION} • Neumorphism</p>
-          </div>
-        </div>
-        
-        <nav className="center flex gap-4 nm-raised p-2 rounded-xl">
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id as Tab)}
-              className={`relative flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-300 overflow-hidden ${
-                activeTab === item.id 
-                  ? 'text-zzz-orange nm-raised-active'
-                  : 'nm-raised-interactive'
-              }`}
-            >
-              {activeTab === item.id && (
-                <motion.div 
-                  layoutId="activeTab"
-                  className="absolute inset-x-0 bottom-0 h-[3px] bg-zzz-orange"
-                  transition={{ type: 'spring', bounce: 0.1, duration: 0.4 }}
-                />
-              )}
-              <item.icon size={14} className={activeTab === item.id ? 'text-zzz-orange' : 'text-zinc-500'} />
-              <span className="relative z-10">{item.label}</span>
-            </button>
-          ))}
-        </nav>
-      </header>
+      <Header
+        subApp={subApp}
+        activeTab={activeTab}
+        tabs={tabs}
+        onTabChange={(id) => setActiveTab(id as Tab)}
+        onSwitchSubApp={handleSwitchSubApp}
+        direction={direction}
+        transition={transition}
+      />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-6 overflow-x-hidden">
         <AnimatePresence mode="wait">
-          {activeTab === 'CALC' && (
+          {subApp === 'zenless' && activeTab === 'CALC' && (
             <motion.div
               key="calc"
               initial={{ opacity: 0, y: 10 }}
@@ -121,7 +104,7 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === 'DRIVE' && (
+          {subApp === 'zenless' && activeTab === 'DRIVE' && (
             <motion.div
               key="drive"
               initial={{ opacity: 0, y: 10 }}
@@ -132,7 +115,7 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === 'CURVE' && (
+          {subApp === 'zenless' && activeTab === 'CURVE' && (
             <motion.div
               key="curve"
               initial={{ opacity: 0, y: 10 }}
@@ -143,7 +126,7 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === 'FORMULA' && (
+          {subApp === 'zenless' && activeTab === 'FORMULA' && (
             <motion.div
               key="formula"
               initial={{ opacity: 0, y: 10 }}
@@ -154,7 +137,7 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === 'DOCS' && (
+          {subApp === 'zenless' && activeTab === 'DOCS' && (
             <motion.div
               key="docs"
               initial={{ opacity: 0, y: 10 }}
@@ -165,7 +148,7 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === 'ME' && (
+          {subApp === 'zenless' && activeTab === 'ME' && (
             <motion.div
               key="me"
               initial={{ opacity: 0, y: 10 }}
@@ -173,6 +156,21 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
             >
               <Me />
+            </motion.div>
+          )}
+
+          {subApp === 'modmanager' && (
+            <motion.div
+              key="modmanager"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex flex-col items-center justify-center py-20 gap-4"
+            >
+              <div className="p-8 nm-raised rounded-2xl text-center">
+                <h2 className="text-xl font-black text-zinc-800">ZZMI MOD MANAGER</h2>
+                <p className="text-sm text-zinc-500 mt-2">Mod 管理器正在开发中...</p>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

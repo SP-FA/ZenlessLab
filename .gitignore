@@ -2,7 +2,6 @@ node_modules/
 build/
 dist/
 dist-electron/
-electron/
 coverage/
 release/
 .dart_tool/
