@@ -8,29 +8,46 @@ import { Docs } from './components/Docs';
 import { Me } from './components/About';
 import { MarginalBenefitChart } from './components/MarginalBenefitChart';
 import { DriveManager } from './components/DriveManager';
-import { Header, HeaderTab } from './components/Header';
-import { LayoutDashboard, Calculator as CalcIcon, BookOpen, FileCode, AtSign, Github, TrendingUp, Disc } from 'lucide-react';
+import { Header, HeaderTab, SubApp } from './components/Header';
+import { LayoutDashboard, Calculator as CalcIcon, BookOpen, FileCode, AtSign, Github, TrendingUp, Disc, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { storage } from './services/storage';
 
-type Tab = 'CALC' | 'CURVE' | 'DRIVE' | 'FORMULA' | 'DOCS' | 'ME';
+type Tab = 'CALC' | 'CURVE' | 'FORMULA' | 'DOCS' | 'ME';
+type ZenlessDiscalTab = 'DRIVE' | 'DOCS' | 'ABOUT';
+type ModManagerTab = 'MODS' | 'DOCS' | 'ABOUT';
 
-const tabs: HeaderTab[] = [
+const subAppOrder: readonly SubApp[] = ['zenless', 'zenlessdiscal', 'modmanager'] as const;
+
+const zenlessTabs: HeaderTab[] = [
   { id: 'CALC', label: '计算分析', icon: CalcIcon },
   { id: 'CURVE', label: '收益曲线', icon: TrendingUp },
-  { id: 'DRIVE', label: '驱动盘', icon: Disc },
   { id: 'FORMULA', label: '计算公式', icon: FileCode },
   { id: 'DOCS', label: '指南文档', icon: BookOpen },
   { id: 'ME', label: 'About', icon: AtSign },
+];
+
+const zenlessDiscalTabs: HeaderTab[] = [
+  { id: 'DRIVE', label: '驱动盘仓库', icon: Disc },
+  { id: 'DOCS', label: '指南文档', icon: BookOpen },
+  { id: 'ABOUT', label: 'About', icon: AtSign },
+];
+
+const modManagerTabs: HeaderTab[] = [
+  { id: 'MODS', label: 'Mod Manager', icon: Package },
+  { id: 'DOCS', label: '指南文档', icon: BookOpen },
+  { id: 'ABOUT', label: 'About', icon: AtSign },
 ];
 
 const transition = { type: 'spring' as const, bounce: 0.1, duration: 0.4 };
 
 export default function App() {
   useNeumorphicPressScale();
-  const [subApp, setSubApp] = useState<'zenless' | 'modmanager'>('zenless');
+  const [subApp, setSubApp] = useState<SubApp>('zenless');
   const [direction, setDirection] = useState(1);
   const [activeTab, setActiveTab] = useState<Tab>('CALC');
+  const [zenlessDiscalTab, setZenlessDiscalTab] = useState<ZenlessDiscalTab>('DRIVE');
+  const [modManagerTab, setModManagerTab] = useState<ModManagerTab>('MODS');
   const [currentProfile, setCurrentProfile] = useState<CharacterProfile>(() => {
     // Try to load initial profile from storage
     const profiles = storage.getProfiles();
@@ -54,18 +71,35 @@ export default function App() {
     setCurrentProfile(profile);
   };
 
-  const handleSwitchSubApp = () => {
-    setDirection(subApp === 'zenless' ? 1 : -1);
-    setSubApp(subApp === 'zenless' ? 'modmanager' : 'zenless');
+  const handleSwitchSubApp = (target: SubApp) => {
+    const currentIndex = subAppOrder.indexOf(subApp);
+    const targetIndex = subAppOrder.indexOf(target);
+    setDirection(targetIndex > currentIndex ? 1 : -1);
+    setSubApp(target);
+    if (target === 'zenless') setActiveTab('CALC');
+    else if (target === 'zenlessdiscal') setZenlessDiscalTab('DRIVE');
+    else setModManagerTab('MODS');
   };
 
   return (
     <div className="min-h-screen bg-[#f0f3f6] text-zinc-800 font-sans selection:bg-zzz-orange/20">
       <Header
         subApp={subApp}
-        activeTab={activeTab}
-        tabs={tabs}
-        onTabChange={(id) => setActiveTab(id as Tab)}
+        activeTab={
+          subApp === 'zenless' ? activeTab :
+          subApp === 'zenlessdiscal' ? zenlessDiscalTab :
+          modManagerTab
+        }
+        tabs={
+          subApp === 'zenless' ? zenlessTabs :
+          subApp === 'zenlessdiscal' ? zenlessDiscalTabs :
+          modManagerTabs
+        }
+        onTabChange={(id) => {
+          if (subApp === 'zenless') setActiveTab(id as Tab);
+          else if (subApp === 'zenlessdiscal') setZenlessDiscalTab(id as ZenlessDiscalTab);
+          else setModManagerTab(id as ModManagerTab);
+        }}
         onSwitchSubApp={handleSwitchSubApp}
         direction={direction}
         transition={transition}
@@ -101,17 +135,6 @@ export default function App() {
                 improvements={improvements}
                 onImprovementsChange={setImprovements}
               />
-            </motion.div>
-          )}
-
-          {subApp === 'zenless' && activeTab === 'DRIVE' && (
-            <motion.div
-              key="drive"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              <DriveManager />
             </motion.div>
           )}
 
@@ -159,17 +182,88 @@ export default function App() {
             </motion.div>
           )}
 
-          {subApp === 'modmanager' && (
+          {subApp === 'zenlessdiscal' && zenlessDiscalTab === 'DRIVE' && (
             <motion.div
-              key="modmanager"
+              key="zd-drive"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <DriveManager />
+            </motion.div>
+          )}
+
+          {subApp === 'zenlessdiscal' && zenlessDiscalTab === 'DOCS' && (
+            <motion.div
+              key="zd-docs"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className="flex flex-col items-center justify-center py-20 gap-4"
             >
               <div className="p-8 nm-raised rounded-2xl text-center">
-                <h2 className="text-xl font-black text-zinc-800">ZZMI MOD MANAGER</h2>
+                <h2 className="text-xl font-black text-zinc-800">指南文档</h2>
+                <p className="text-sm text-zinc-500 mt-2">开发中...</p>
+              </div>
+            </motion.div>
+          )}
+
+          {subApp === 'zenlessdiscal' && zenlessDiscalTab === 'ABOUT' && (
+            <motion.div
+              key="zd-about"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex flex-col items-center justify-center py-20 gap-4"
+            >
+              <div className="p-8 nm-raised rounded-2xl text-center">
+                <h2 className="text-xl font-black text-zinc-800">About</h2>
+                <p className="text-sm text-zinc-500 mt-2">开发中...</p>
+              </div>
+            </motion.div>
+          )}
+
+          {subApp === 'modmanager' && modManagerTab === 'MODS' && (
+            <motion.div
+              key="mm-mods"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex flex-col items-center justify-center py-20 gap-4"
+            >
+              <div className="p-8 nm-raised rounded-2xl text-center">
+                <h2 className="text-xl font-black text-zinc-800">MOD MANAGER</h2>
                 <p className="text-sm text-zinc-500 mt-2">Mod 管理器正在开发中...</p>
+              </div>
+            </motion.div>
+          )}
+
+          {subApp === 'modmanager' && modManagerTab === 'DOCS' && (
+            <motion.div
+              key="mm-docs"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex flex-col items-center justify-center py-20 gap-4"
+            >
+              <div className="p-8 nm-raised rounded-2xl text-center">
+                <h2 className="text-xl font-black text-zinc-800">指南文档</h2>
+                <p className="text-sm text-zinc-500 mt-2">开发中...</p>
+              </div>
+            </motion.div>
+          )}
+
+          {subApp === 'modmanager' && modManagerTab === 'ABOUT' && (
+            <motion.div
+              key="mm-about"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex flex-col items-center justify-center py-20 gap-4"
+            >
+              <div className="p-8 nm-raised rounded-2xl text-center">
+                <h2 className="text-xl font-black text-zinc-800">About</h2>
+                <p className="text-sm text-zinc-500 mt-2">开发中...</p>
               </div>
             </motion.div>
           )}

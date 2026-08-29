@@ -9,12 +9,14 @@ export interface HeaderTab {
   icon: React.ComponentType<{ size?: number; className?: string }>;
 }
 
+export type SubApp = 'zenless' | 'zenlessdiscal' | 'modmanager';
+
 interface HeaderProps {
-  subApp: 'zenless' | 'modmanager';
+  subApp: SubApp;
   activeTab: string;
   tabs: HeaderTab[];
   onTabChange: (tabId: string) => void;
-  onSwitchSubApp: () => void;
+  onSwitchSubApp: (target: SubApp) => void;
   direction: number;
   transition: object;
 }
@@ -34,11 +36,24 @@ const slideVariants = {
   }),
 };
 
+const TITLES: Record<SubApp, string> = {
+  zenless: 'ZENLESS LAB',
+  zenlessdiscal: 'ZENLESS DISCAL',
+  modmanager: 'MOD MANAGER',
+};
+
+const LAYOUT_KEYS: Record<SubApp, string> = {
+  zenless: 'activeTab-zl',
+  zenlessdiscal: 'activeTab-zd',
+  modmanager: 'activeTab-mm',
+};
+
+const SUBAPP_ORDER: readonly SubApp[] = ['zenless', 'zenlessdiscal', 'modmanager'] as const;
+
 export function Header({ subApp, activeTab, tabs, onTabChange, onSwitchSubApp, direction, transition }: HeaderProps) {
-  const title = subApp === 'zenless' ? 'ZENLESS LAB' : 'ZZMI MOD MANAGER';
-  const switchLabel = subApp === 'zenless' ? 'Mod Manager' : 'Zenless Lab';
-  const SwitchIcon = subApp === 'zenless' ? ArrowRight : ArrowLeft;
-  const layoutKey = subApp === 'zenless' ? 'activeTab-zl' : 'activeTab-mm';
+  const currentIndex = SUBAPP_ORDER.indexOf(subApp);
+  const title = TITLES[subApp];
+  const layoutKey = LAYOUT_KEYS[subApp];
 
   return (
     <header className="sticky top-0 z-50 px-4 pt-3">
@@ -90,15 +105,29 @@ export function Header({ subApp, activeTab, tabs, onTabChange, onSwitchSubApp, d
             ))}
           </nav>
 
-          {/* Right: sub-app switch button */}
-          <div className="right flex items-center justify-end">
-            <button
-              onClick={onSwitchSubApp}
-              className="nm-raised-interactive flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold text-zinc-600"
-            >
-              {switchLabel}
-              <SwitchIcon size={13} />
-            </button>
+          {/* Right: sub-app switch buttons */}
+          <div className="right flex items-center justify-end gap-1.5">
+            {/* Left button: go to previous sub-app */}
+            {currentIndex > 0 && (
+              <button
+                onClick={() => onSwitchSubApp(SUBAPP_ORDER[currentIndex - 1])}
+                className="nm-raised-interactive flex items-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-semibold text-zinc-600"
+              >
+                <ArrowLeft size={13} />
+                {TITLES[SUBAPP_ORDER[currentIndex - 1]]}
+              </button>
+            )}
+
+            {/* Right button: go to next sub-app */}
+            {currentIndex < SUBAPP_ORDER.length - 1 && (
+              <button
+                onClick={() => onSwitchSubApp(SUBAPP_ORDER[currentIndex + 1])}
+                className="nm-raised-interactive flex items-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-semibold text-zinc-600"
+              >
+                {TITLES[SUBAPP_ORDER[currentIndex + 1]]}
+                <ArrowRight size={13} />
+              </button>
+            )}
           </div>
         </motion.div>
       </AnimatePresence>
