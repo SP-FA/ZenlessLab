@@ -1,6 +1,26 @@
+/**
+ * @file Docs.tsx
+ * @description Zenless Lab 子应用的使用指南文档页面。
+ *
+ * 以分节卡片形式展示三大核心功能的使用说明：
+ * - 档案与配队管理
+ * - 数值输入规范
+ * - 收益计算
+ */
+
 import React from 'react';
 import { Save, Trash2, FolderOpen, Plus, Sparkles, HelpCircle, Compass } from 'lucide-react';
 
+/**
+ * Docs — Zenless Lab 使用指南页面
+ *
+ * 结构：
+ * - 档案与配队管理（5 步操作说明）
+ * - 数值输入规范（白值/战前/战后/百分比）
+ * - 收益计算（词条提升 + 边际收益曲线）
+ *
+ * @returns JSX 元素
+ */
 export const Docs: React.FC = () => {
   return (
     <div className="w-full nm-raised p-8 rounded-2xl">
@@ -62,7 +82,7 @@ export const Docs: React.FC = () => {
           <ul className="space-y-3.5 text-xs text-zinc-650 pl-2 leading-relaxed">
             <li className="flex gap-2">
               <span className="text-zzz-orange font-bold font-mono">01.</span>
-              <span><b>白值：</b>角色基础属性（如攻击力白值=角色基础攻击力+音擎大攻击力词条）。可通过 “绝区零工坊” 等微信小程序中的角色练度面板直接查看角色白值</span>
+              <span><b>白值：</b>角色基础属性（如攻击力白值=角色基础攻击力+音擎大攻击力词条）。可通过 "绝区零工坊" 等微信小程序中的角色练度面板直接查看角色白值</span>
             </li>
             <li className="flex gap-2">
               <span className="text-zzz-orange font-bold font-mono">02.</span>

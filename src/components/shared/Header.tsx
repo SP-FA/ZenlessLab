@@ -1,26 +1,57 @@
+/**
+ * @file Header.tsx
+ * @description 全局顶部导航栏组件。
+ *
+ * 提供三栏布局（左侧 Logo + 标题、中间子应用内 Tab 导航、右侧子应用切换按钮）。
+ * 支持子应用切换时的滑动动画（motion/react AnimatePresence），
+ * 以及 Tab 切换时的 layoutId 指示器动画。
+ *
+ * 被所有子应用共用，是应用的顶层导航入口。
+ */
+
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
-import config from '../../config.json';
+import config from '../../../config.json';
 
+/** 导航 Tab 定义 */
 export interface HeaderTab {
+  /** Tab 唯一标识 */
   id: string;
+  /** 显示文本 */
   label: string;
+  /** Tab 图标组件 */
   icon: React.ComponentType<{ size?: number; className?: string }>;
 }
 
+/** 子应用标识 */
 export type SubApp = 'zenless' | 'zenlessdiscal' | 'modmanager';
 
+/** Header 组件 Props */
 interface HeaderProps {
+  /** 当前活跃的子应用 */
   subApp: SubApp;
+  /** 当前子应用内活跃的 Tab ID */
   activeTab: string;
+  /** 当前子应用的 Tab 列表 */
   tabs: HeaderTab[];
+  /**
+   * Tab 切换回调
+   * @param tabId - 目标 Tab 的 ID
+   */
   onTabChange: (tabId: string) => void;
+  /**
+   * 子应用切换回调
+   * @param target - 目标子应用标识
+   */
   onSwitchSubApp: (target: SubApp) => void;
+  /** 切换方向：1 为向右，-1 为向左 */
   direction: number;
+  /** motion/react 动画过渡配置 */
   transition: object;
 }
 
+/** 子应用切换动画变体 */
 const slideVariants = {
   enter: (dir: number) => ({
     x: dir > 0 ? '100%' : '-100%',
@@ -36,20 +67,34 @@ const slideVariants = {
   }),
 };
 
+/** 子应用标题映射 */
 const TITLES: Record<SubApp, string> = {
   zenless: 'ZENLESS LAB',
   zenlessdiscal: 'ZENLESS DISCAL',
   modmanager: 'MOD MANAGER',
 };
 
+/** 子应用 Tab 指示器 layoutId 映射（避免跨子应用动画冲突） */
 const LAYOUT_KEYS: Record<SubApp, string> = {
   zenless: 'activeTab-zl',
   zenlessdiscal: 'activeTab-zd',
   modmanager: 'activeTab-mm',
 };
 
+/** 子应用切换顺序 */
 const SUBAPP_ORDER: readonly SubApp[] = ['zenless', 'zenlessdiscal', 'modmanager'] as const;
 
+/**
+ * Header — 全局顶部导航栏
+ *
+ * 三栏布局：
+ * - 左侧：Logo + 应用标题 + 版本号
+ * - 中间：子应用内 Tab 导航（带 layoutId 动画指示器）
+ * - 右侧：上一个/下一个子应用切换按钮
+ *
+ * @param props - 组件属性
+ * @returns JSX 元素
+ */
 export function Header({ subApp, activeTab, tabs, onTabChange, onSwitchSubApp, direction, transition }: HeaderProps) {
   const currentIndex = SUBAPP_ORDER.indexOf(subApp);
   const title = TITLES[subApp];

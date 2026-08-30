@@ -1,23 +1,37 @@
+/**
+ * @file About.tsx
+ * @description Zenless Lab 子应用的 About 页面。
+ *
+ * 展示开发者信息、联系方式、TODO 列表和版本计划。
+ * 包含头像、GitHub 链接、邮箱、以及已完成/待完成的功能清单。
+ */
+
 import React from 'react';
-import { Github, Mail, CheckCircle, Circle, HardDrive, Gamepad2, Info } from 'lucide-react';
-import { 
-  Terminal, Cpu, Heart, Award, Sparkles, Send, Copy, Check, ShieldCheck 
-} from 'lucide-react';
-import { motion } from 'motion/react';
-import avatarImg from '../assets/images/spfa_avatar_1780302650134.png';
-import bgImg from '../assets/images/bg.png';
+import { Github, Mail, CheckCircle, Circle, Gamepad2 } from 'lucide-react';
+import { Cpu } from 'lucide-react';
+import avatarImg from '../../assets/images/spfa_avatar_1780302650134.png';
+import bgImg from '../../assets/images/bg.png';
 
-
-export const Me: React.FC = () => {
+/**
+ * About — Zenless Lab 关于页面
+ *
+ * 布局：
+ * - 左侧：开发者卡片（头像、名称、联系方式）
+ * - 右侧：背景图展示
+ * - 底部：TODO 列表（已完成 + 待完成）+ 版本标语
+ *
+ * @returns JSX 元素
+ */
+export const About: React.FC = () => {
   return (
     <div>
       <div className="w-full nm-raised p-8 rounded-3xl grid grid-cols-1 lg:grid-cols-18 gap-4 items-center">
         <div className="lg:col-span-5 flex flex-col items-center justify-center text-center p-6 nm-sunken rounded-2xl">
           <div className="relative mb-5 group">
             <div className="nm-raised flex w-28 h-28 rounded-full justify-center items-center">
-                <img 
-                  src={avatarImg} 
-                  alt="SPFA Avatar" 
+                <img
+                  src={avatarImg}
+                  alt="SPFA Avatar"
                   className="w-25 h-25 rounded-full object-cover"
                   referrerPolicy="no-referrer"
                 />
@@ -42,17 +56,17 @@ export const Me: React.FC = () => {
                 <Gamepad2 size={14} className="text-zzz-orange" />
                 UID：
               </span>
-              <a 
-                href="https://github.com/SP-FA/ZenlessLab" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href="https://github.com/SP-FA/ZenlessLab"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 justify-center p-2 nm-raised text-xs font-bold rounded-lg text-zzz-orange"
               >
                 <Github size={14} />
                 SP-FA / ZenlessLab
               </a>
-              <a 
-                href="mailto:2997839760@qq.com" 
+              <a
+                href="mailto:2997839760@qq.com"
                 className="inline-flex items-center gap-2 justify-center p-2 nm-raised text-xs font-bold rounded-lg text-zzz-orange"
               >
                 <Mail size={14} className="text-zzz-orange" />
@@ -62,20 +76,14 @@ export const Me: React.FC = () => {
           </div>
         </div>
         <div className="lg:col-span-13 h-full p-2 flex nm-raised-big rounded-xl">
-            <div 
-              className="w-full h-full rounded-lg nm-sunken-focus-within" 
-              style={{ 
+            <div
+              className="w-full h-full rounded-lg nm-sunken-focus-within"
+              style={{
                 backgroundImage: `url(${bgImg})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'left'
               }}
             >
-              {/* <img 
-                src={bgImg} 
-                alt="Background" 
-                className="h-full object-cover object-left rounded-lg"
-                referrerPolicy="no-referrer"
-              /> */}
             </div>
         </div>
       </div>
@@ -88,7 +96,7 @@ export const Me: React.FC = () => {
           </h2>
           <p className="text-sm text-zinc-500">💪 我会尽量完成</p>
         </div>
-        <div className="p-6 nm-sunken rounded-2xl mb-6">        
+        <div className="p-6 nm-sunken rounded-2xl mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-xs text-zinc-650">
             <div className="space-y-3">
               <div className="flex items-center gap-2.5">

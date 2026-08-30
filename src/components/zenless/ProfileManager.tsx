@@ -1,16 +1,54 @@
+/**
+ * @file ProfileManager.tsx
+ * @description 角色档案管理组件（Zenless Lab 专属）。
+ *
+ * 提供角色档案的 CRUD 操作：
+ * - 新建空白档案
+ * - 保存当前档案到 localStorage
+ * - 从档案列表中选择并加载已有档案
+ * - 删除档案
+ * - 编辑档案名称、角色类型、配队信息、备注
+ *
+ * 使用 localStorage 持久化存储，支持跨会话数据保留。
+ */
+
 import React, { useState, useEffect } from 'react';
-import { CharacterProfile, CharacterType, DEFAULT_STATS } from '../types';
-import { storage } from '../services/storage';
+import { CharacterProfile, CharacterType, DEFAULT_STATS } from '../../types';
+import { storage } from '../../services/storage';
 import { Save, Trash2, FolderOpen, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { NeoSelect } from './NeoSelect';
+import { NeoSelect } from '../shared/NeoSelect';
 
+/** ProfileManager 组件 Props */
 interface ProfileManagerProps {
+  /**
+   * 选择档案回调
+   * @param profile - 被选中的角色档案
+   */
   onSelect: (profile: CharacterProfile) => void;
+  /** 当前正在编辑的角色档案 */
   currentProfile: CharacterProfile;
+  /**
+   * 更新当前档案回调
+   * @param profile - 更新后的角色档案
+   */
   onUpdate: (profile: CharacterProfile) => void;
 }
 
+/**
+ * ProfileManager — 角色档案管理
+ *
+ * 功能：
+ * - 档案名称输入
+ * - 角色类型选择（强攻/异常/命破）
+ * - 配队与驱动盘信息表格（3 人队伍）
+ * - 备注信息文本框
+ * - 保存/新建/档案列表按钮
+ * - 档案列表面板（展开/收起动画）
+ *
+ * @param props - 组件属性
+ * @returns JSX 元素
+ */
 export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, currentProfile, onUpdate }) => {
   const [profiles, setProfiles] = useState<CharacterProfile[]>([]);
   const [showList, setShowList] = useState(false);
@@ -19,12 +57,19 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
     setProfiles(storage.getProfiles());
   }, []);
 
+  /**
+   * 保存当前档案到 localStorage
+   */
   const handleSave = () => {
     const saved = storage.saveProfile(currentProfile);
     onSelect(saved);
     setProfiles(storage.getProfiles());
   };
 
+  /**
+   * 删除指定 ID 的档案
+   * @param id - 要删除的档案 ID
+   */
   const handleDelete = (id: number) => {
     storage.deleteProfile(id);
     setProfiles(storage.getProfiles());
@@ -33,6 +78,9 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
     }
   };
 
+  /**
+   * 创建新的空白档案
+   */
   const handleNew = () => {
     onUpdate({
       name: '新档案',
@@ -57,23 +105,23 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
           角色档案管理
         </h2>
         <div className="flex gap-5">
-          <button 
-            onClick={handleNew} 
-            className="p-3 nm-raised-interactive hover:text-zzz-orange text-zinc-500 rounded-xl transition-all" 
+          <button
+            onClick={handleNew}
+            className="p-3 nm-raised-interactive hover:text-zzz-orange text-zinc-500 rounded-xl transition-all"
             title="新建档案"
           >
             <Plus size={18} />
           </button>
-          <button 
-            onClick={handleSave} 
-            className="p-3 nm-orange-raised-interactive text-white rounded-xl transition-all" 
+          <button
+            onClick={handleSave}
+            className="p-3 nm-orange-raised-interactive text-white rounded-xl transition-all"
             title="保存当前档案"
           >
             <Save size={18} />
           </button>
-          <button 
-            onClick={() => setShowList(!showList)} 
-            className={`p-3 rounded-xl transition-all ${showList ? 'nm-raised-active text-zzz-orange' : 'nm-raised-interactive text-zinc-500'}`} 
+          <button
+            onClick={() => setShowList(!showList)}
+            className={`p-3 rounded-xl transition-all ${showList ? 'nm-raised-active text-zzz-orange' : 'nm-raised-interactive text-zinc-500'}`}
             title="打开档案列表"
           >
             <FolderOpen size={18} />
@@ -216,7 +264,7 @@ export const ProfileManager: React.FC<ProfileManagerProps> = ({ onSelect, curren
 
       <AnimatePresence>
         {showList && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}

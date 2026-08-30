@@ -1,16 +1,40 @@
+/**
+ * @file presets.ts
+ * @description 游戏预设数据定义。
+ *
+ * 包含绝区零中所有角色、音擎、驱动盘套装的预设数据：
+ * - CHARACTER_PRESETS：角色白值（基础攻击力 + 基础生命值）
+ * - WENGINE_PRESETS：音擎白值（基础攻击力）
+ * - DRIVE_DISC_PRESETS：驱动盘套装（2件套/4件套效果、颜色、图片）
+ *
+ * 被 CalculatorPage、DriveManager 等组件引用。
+ */
+
+// ====================== 角色预设 ======================
+
+/** 角色预设定义 */
 export interface CharacterPreset {
+  /** 角色名称 */
   name: string;
+  /** 稀有度 */
   rarity: 'S' | 'A';
+  /** 基础攻击力（不含音擎） */
   baseAtk: number;
+  /** 基础生命值 */
   baseHp: number;
 }
 
+/** 音擎预设定义 */
 export interface WEnginePreset {
+  /** 音擎名称 */
   name: string;
+  /** 稀有度 */
   rarity: 'S' | 'A' | 'B';
+  /** 基础攻击力 */
   baseAtk: number;
 }
 
+/** 角色白值预设列表 */
 export const CHARACTER_PRESETS: CharacterPreset[] = [
   { name: '星徽比利', rarity: 'S', baseAtk: 784, baseHp: 8497 },
   { name: '普罗米娅', rarity: 'S', baseAtk: 872, baseHp: 7788 },
@@ -68,6 +92,7 @@ export const CHARACTER_PRESETS: CharacterPreset[] = [
   { name: '安比', rarity: 'A', baseAtk: 583, baseHp: 7500 },
 ];
 
+/** 音擎白值预设列表 */
 export const WENGINE_PRESETS: WEnginePreset[] = [
   { name: '辉骑面铠', rarity: 'S', baseAtk: 713 },
   { name: '朔月裁霜', rarity: 'S', baseAtk: 713 },
@@ -146,18 +171,26 @@ export const WENGINE_PRESETS: WEnginePreset[] = [
   { name: '星徽引擎', rarity: 'A', baseAtk: 594 },
 ];
 
+// ====================== 驱动盘套装 ======================
+
+/** 驱动盘套装预设定义 */
 export interface DriveDiscPreset {
+  /** 套装名称 */
   name: string;
+  /** 2 件套效果描述 */
   twoPieceEffect: string;
+  /** 4 件套效果描述 */
   fourPieceEffect: string;
+  /** 套装标识颜色 */
   color: string;
   /**
-   * 套装缩略图。将图片放入 `src/assets/drive-discs/` 后，在这里填入对应 import。
-   * 未配置时，界面会显示带套装色的图片占位符。
+   * 套装缩略图。将图片放入 `src/assets/drive-discs/` 后，
+   * 在这里填入对应 import。未配置时显示占位符。
    */
   image?: string;
 }
 
+/** 驱动盘套装预设列表 */
 export const DRIVE_DISC_PRESETS: DriveDiscPreset[] = [
   {
     name: '囚徒手记',

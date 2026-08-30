@@ -1,3 +1,17 @@
+/**
+ * index.css — 全局样式文件
+ *
+ * 设计系统基于拟物风格（Neumorphism），核心设计 Tokens：
+ * - nm-raised / nm-raised-interactive / nm-raised-active：突出元素（卡片、按钮）
+ * - nm-sunken / nm-sunken-active：凹陷元素（输入框、选中状态）
+ * - nm-orange-raised / nm-orange-raised-interactive：品牌色按钮
+ * - nm-del-raised-interactive：删除按钮
+ * - neo-select：下拉选择器体系
+ *
+ * 所有可交互的拟物元素使用 CSS 自定义属性实现统一的 hover/press 缩放效果，
+ * 缩放值由 useNeumorphicPressScale hook 动态计算。
+ */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 

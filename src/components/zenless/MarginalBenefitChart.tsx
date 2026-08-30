@@ -1,13 +1,26 @@
+/**
+ * @file MarginalBenefitChart.tsx
+ * @description 边际收益曲线图表页面（Zenless Lab 专属）。
+ *
+ * 使用 Recharts 绘制多条词条的边际收益曲线，展示在当前面板下
+ * 每额外投入一个单位词条所带来的即时伤害提升百分比。
+ * 曲线随角色类型（强攻/异常/命破）自动切换展示的相关词条。
+ */
+
 import React, { useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { CharacterStats, CharacterType, STAT_LABELS } from '../types';
-import { generateMarginalCurveData } from '../utils/calculator';
+import { CharacterStats, CharacterType, STAT_LABELS } from '../../types';
+import { generateMarginalCurveData } from '../../utils/calculator';
 
+/** MarginalBenefitChart 组件 Props */
 interface MarginalBenefitChartProps {
+  /** 当前角色属性数值 */
   stats: CharacterStats;
+  /** 角色类型 */
   type: CharacterType;
 }
 
+/** 图表曲线颜色调色板 */
 const COLORS = [
   '#f37f0f', // zzz-orange
   '#3b82f6', // blue-500
@@ -21,11 +34,25 @@ const COLORS = [
   '#14b8a6', // teal-500
 ];
 
+/**
+ * MarginalBenefitChart — 边际收益曲线
+ *
+ * 功能：
+ * - 根据角色类型自动筛选相关词条
+ * - 多条曲线叠加展示，支持 Tooltip 交互
+ * - 底部展示单位词条增量参考值
+ *
+ * @param props - 组件属性
+ * @returns JSX 元素
+ */
 export const MarginalBenefitChart: React.FC<MarginalBenefitChartProps> = ({ stats, type }) => {
   if (!stats) return null;
   const data = useMemo(() => generateMarginalCurveData(stats, type, 20), [stats, type]);
 
-  // Fixed stats to show based on character type
+  /**
+   * 根据角色类型筛选需要展示的边际收益词条
+   * @returns 相关词条的 key 列表
+   */
   const relevantStats = useMemo(() => {
     if (type === 'ATTACK') {
       return ['atk_flat_pre', 'atk_pct_pre', 'crit_rate', 'crit_dmg', 'dmg_bonus', 'res_shred', 'def_shred', 'pen_ratio', 'pen_flat'];
@@ -37,6 +64,7 @@ export const MarginalBenefitChart: React.FC<MarginalBenefitChartProps> = ({ stat
     return [];
   }, [type]);
 
+  /** 自定义 Tooltip 组件 */
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -68,34 +96,34 @@ export const MarginalBenefitChart: React.FC<MarginalBenefitChartProps> = ({ stat
           <span className="text-zzz-orange/85 italic text-xs font-medium">* X轴：投入 N 个单位词条 | Y轴：第 N 个单位词条带来的收益 (%)</span>
         </p>
       </div>
-      
+
       <div className="w-full h-[650px]">
         <ResponsiveContainer className="nm-raised rounded-xl pt-20 pb-5 pl-10 pr-10">
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="#8a3e01" vertical={false} opacity={0.8} />
-            <XAxis 
-              dataKey="step" 
-              stroke="#8e8e93" 
-              fontSize={12} 
-              tickLine={false} 
+            <XAxis
+              dataKey="step"
+              stroke="#8e8e93"
+              fontSize={12}
+              tickLine={false}
               axisLine={false}
               dy={10}
               label={{ value: '投入词条数量', position: 'insideBottom', offset: -20, fontSize: 11, fill: '#64748b', fontWeight: 600 }}
             />
-            <YAxis 
-              stroke="#8e8e93" 
-              fontSize={12} 
-              tickLine={false} 
+            <YAxis
+              stroke="#8e8e93"
+              fontSize={12}
+              tickLine={false}
               axisLine={false}
               dx={-5}
               tickFormatter={(value) => `${value}%`}
               label={{ value: '边际收益 (%)', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#64748b', fontWeight: 600 }}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend 
-              verticalAlign="bottom" 
-              align="center" 
-              iconType="circle" 
+            <Legend
+              verticalAlign="bottom"
+              align="center"
+              iconType="circle"
               wrapperStyle={{ top: '-40px' }}
               formatter={(value) => <span className="text-zinc-600 text-xs font-semibold">{STAT_LABELS[value as keyof CharacterStats].split(' (')[0]}</span>}
             />

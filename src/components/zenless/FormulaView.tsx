@@ -1,6 +1,28 @@
+/**
+ * @file FormulaView.tsx
+ * @description 伤害计算公式展示页面（Zenless Lab 专属）。
+ *
+ * 以可视化卡片形式展示绝区零伤害计算的核心公式体系：
+ * - 基础乘区（攻击区、生命区、增伤区、抗性区、贯穿力）
+ * - 防御区（基础防御力、敌人防御力、防御乘区）
+ * - 各职业最终期望公式（强攻、异常、命破）
+ * - 词条收益计算公式
+ */
+
 import React from 'react';
 import { Binary, Shield, Compass, Swords, HelpCircle } from 'lucide-react';
 
+/**
+ * FormulaView — 计算公式展示页面
+ *
+ * 结构：
+ * - 基础乘区（5 个公式卡片）
+ * - 防御区（3 个公式卡片）
+ * - 各职业最终期望公式（3 个卡片）
+ * - 词条收益计算说明
+ *
+ * @returns JSX 元素
+ */
 export const FormulaView: React.FC = () => {
   return (
     <div className="w-full nm-raised p-8 rounded-2xl">

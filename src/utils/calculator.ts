@@ -1,7 +1,35 @@
+/**
+ * @file calculator.ts
+ * @description 伤害计算核心工具函数。
+ *
+ * 实现绝区零伤害计算的核心公式，包括：
+ * - calculateDamage：根据角色属性和类型计算伤害期望
+ * - calculateGain：计算各词条提升的收益百分比
+ * - generateCurveData：生成词条收益曲线数据（累计收益）
+ * - generateMarginalCurveData：生成边际收益曲线数据（增量收益）
+ *
+ * 支持三种角色类型：强攻（ATTACK）、异常（ANOMALY）、命破（STUN）。
+ */
+
 import { CharacterStats, CharacterType } from "../types";
 
+// ====================== 伤害计算 ======================
+
+/**
+ * 计算角色在当前属性面板下的伤害期望值
+ *
+ * 公式按角色类型区分：
+ * - 强攻：基础攻击区 × (1 + 暴击率 × 暴击伤害) × 增伤区 × 抗性区 × 防御区
+ * - 异常：基础攻击区 × 异常精通 × 增伤区 × 抗性区 × 防御区
+ * - 命破：贯穿力 × (1 + 暴击率 × 暴击伤害) × 增伤区 × 抗性区
+ *   （贯穿力 = 0.3 × 基础攻击区 + 0.1 × 基础生命区）
+ *
+ * @param stats - 角色属性值
+ * @param type - 角色类型
+ * @returns 伤害期望值
+ */
 export const calculateDamage = (stats: CharacterStats, type: CharacterType) => {
-  // 转换百分比数值
+  // 转换百分比数值为小数
   const atk_pct_pre = stats.atk_pct_pre / 100;
   const atk_pct_post = stats.atk_pct_post / 100;
   const hp_pct_pre = stats.hp_pct_pre / 100;
@@ -33,14 +61,10 @@ export const calculateDamage = (stats: CharacterStats, type: CharacterType) => {
   let damage = 0;
 
   if (type === 'ATTACK') {
-    // 强攻：基础攻击区 * (1 + 暴击率 * 爆伤) * 增伤区 * 抗性区 * 防御区
     damage = baseAtkZone * (1 + crit_rate * crit_dmg) * dmgZone * resZone * defZone;
   } else if (type === 'ANOMALY') {
-    // 异常：基础攻击区 * 异常精通 * 增伤区 * 抗性区 * 防御区
     damage = baseAtkZone * stats.anomaly_prof * dmgZone * resZone * defZone;
   } else if (type === 'STUN') {
-    // 命破：贯穿力 * (1 + 暴击率 * 爆伤) * 增伤区 * 抗性区
-    // 贯穿力 = 0.3 * 基础攻击区 + 0.1 * 基础生命区
     const penetrationPower = 0.3 * baseAtkZone + 0.1 * baseHpZone;
     damage = penetrationPower * (1 + crit_rate * crit_dmg) * dmgZone * resZone;
   }
@@ -48,16 +72,36 @@ export const calculateDamage = (stats: CharacterStats, type: CharacterType) => {
   return damage;
 };
 
-// 计算词条收益时，穿透率与减防按 100% 封顶，超出的提升不再带来额外收益。
+// ====================== 收益计算 ======================
+
+/**
+ * 对穿透率和减防属性应用 100% 封顶
+ *
+ * 计算词条收益时，穿透率与减防按 100% 封顶，
+ * 超出的提升不再带来额外收益。
+ *
+ * @param stats - 属性值
+ * @param statKey - 属性 key
+ * @returns 封顶后的属性值
+ */
 const applyDefenseBenefitCap = (stats: CharacterStats, statKey: keyof CharacterStats) => {
   if (statKey !== 'pen_ratio' && statKey !== 'def_shred') return stats;
-
   return { ...stats, [statKey]: Math.min(100, stats[statKey]) };
 };
 
+/**
+ * 计算各词条提升的收益百分比
+ *
+ * 收益 = (提升后伤害 / 原伤害) - 1
+ *
+ * @param baseStats - 基础属性值
+ * @param improvements - 各词条的提升值
+ * @param type - 角色类型
+ * @returns 各词条收益百分比映射（key 为属性 key，value 为收益率小数）
+ */
 export const calculateGain = (baseStats: CharacterStats, improvements: Partial<CharacterStats>, type: CharacterType) => {
   const originalDmg = calculateDamage(baseStats, type);
-  
+
   const results: Record<string, number> = {};
 
   Object.keys(improvements).forEach((key) => {
@@ -67,10 +111,7 @@ export const calculateGain = (baseStats: CharacterStats, improvements: Partial<C
       statKey,
     );
     const newDmg = calculateDamage(improvedStats, type);
-    
-    // 收益 = 提升后伤害 / 原伤害 - 1 (用户公式 1 - 提升后/原伤害 可能是笔误，通常收益为正)
-    // 但我会按照用户要求的 1 - 提升后/原伤害 计算，如果结果为负，说明是提升。
-    // 为了直观，我这里计算 (New/Old - 1) 并展示为百分比
+
     if (originalDmg === 0) {
       results[statKey] = 0;
     } else {
@@ -81,6 +122,9 @@ export const calculateGain = (baseStats: CharacterStats, improvements: Partial<C
   return results;
 };
 
+// ====================== 词条单位 ======================
+
+/** 各词条每单位对应的数值（驱动盘副词条平均值） */
 export const STAT_ROLL_UNITS: Record<keyof CharacterStats, number> = {
   atk_base: 0,
   atk_flat_pre: 19,
@@ -102,6 +146,18 @@ export const STAT_ROLL_UNITS: Record<keyof CharacterStats, number> = {
   anomaly_prof: 9
 };
 
+// ====================== 曲线数据 ======================
+
+/**
+ * 生成词条收益曲线数据（累计收益模式）
+ *
+ * 计算从 0 到 steps 个单位词条投入时，每个词条的累计伤害提升百分比。
+ *
+ * @param baseStats - 基础属性值
+ * @param type - 角色类型
+ * @param steps - 投入步数（默认 10）
+ * @returns 曲线数据点数组，每个点包含 step 和各词条的累计收益百分比
+ */
 export const generateCurveData = (baseStats: CharacterStats, type: CharacterType, steps: number = 10) => {
   const originalDmg = calculateDamage(baseStats, type);
   if (originalDmg === 0) return [];
@@ -109,8 +165,7 @@ export const generateCurveData = (baseStats: CharacterStats, type: CharacterType
   const data = [];
   for (let i = 0; i <= steps; i++) {
     const point: any = { step: i };
-    
-    // Calculate for each relevant stat
+
     Object.entries(STAT_ROLL_UNITS).forEach(([key, unit]) => {
       if (unit === 0) return;
       const statKey = key as keyof CharacterStats;
@@ -121,47 +176,56 @@ export const generateCurveData = (baseStats: CharacterStats, type: CharacterType
       const newDmg = calculateDamage(improvedStats, type);
       point[statKey] = Number(((newDmg / originalDmg - 1) * 100).toFixed(2));
     });
-    
+
     data.push(point);
   }
   return data;
 };
 
+/**
+ * 生成边际收益曲线数据（增量收益模式）
+ *
+ * 计算每额外投入一个单位词条时，该单位带来的即时伤害提升百分比。
+ * 边际收益 = (当前伤害 / 上一单位伤害) - 1
+ *
+ * @param baseStats - 基础属性值
+ * @param type - 角色类型
+ * @param steps - 投入步数（默认 20）
+ * @returns 边际收益数据点数组，每个点包含 step 和各词条的边际收益百分比
+ */
 export const generateMarginalCurveData = (baseStats: CharacterStats, type: CharacterType, steps: number = 20) => {
   const data = [];
-  
-  // Calculate for each relevant stat
+
   const statsToCalc = Object.keys(STAT_ROLL_UNITS).filter(k => STAT_ROLL_UNITS[k as keyof CharacterStats] > 0);
 
   for (let i = 1; i <= steps; i++) {
     const point: any = { step: i };
-    
+
     statsToCalc.forEach((key) => {
       const statKey = key as keyof CharacterStats;
       const unit = STAT_ROLL_UNITS[statKey];
-      
-      // Damage with (i-1) units
+
+      // 上一单位伤害
       const prevStats = applyDefenseBenefitCap(
         { ...baseStats, [statKey]: baseStats[statKey] + (unit * (i - 1)) },
         statKey,
       );
       const prevDmg = calculateDamage(prevStats, type);
-      
-      // Damage with i units
+
+      // 当前单位伤害
       const currentStats = applyDefenseBenefitCap(
         { ...baseStats, [statKey]: baseStats[statKey] + (unit * i) },
         statKey,
       );
       const currentDmg = calculateDamage(currentStats, type);
-      
+
       if (prevDmg === 0) {
         point[statKey] = 0;
       } else {
-        // Benefit = (CurrentDmg / PrevDmg) - 1
         point[statKey] = Number(((currentDmg / prevDmg - 1) * 100).toFixed(4));
       }
     });
-    
+
     data.push(point);
   }
   return data;
