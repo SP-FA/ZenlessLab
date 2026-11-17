@@ -28,7 +28,7 @@ export const About: React.FC = () => {
       <div className="w-full nm-raised p-8 rounded-3xl grid grid-cols-1 lg:grid-cols-18 gap-4 items-center">
         <div className="lg:col-span-5 flex flex-col items-center justify-center text-center p-6 nm-sunken rounded-2xl">
           <div className="relative mb-5 group">
-            <div className="nm-raised flex w-28 h-28 rounded-full justify-center items-center">
+            <div className="nm-raised-big flex w-28 h-28 rounded-full justify-center items-center">
                 <img
                   src={avatarImg}
                   alt="SPFA Avatar"
